@@ -27,7 +27,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 		.setDescription('Документация API')
 		.setVersion('1.0')
 		.addTag('persons')
-		// .addBearerAuth() // Для JWT-аутентификации
+		.addBearerAuth()
 		.build();
 
 	const document = SwaggerModule.createDocument(app, configSwager);
