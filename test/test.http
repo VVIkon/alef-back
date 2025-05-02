@@ -8,19 +8,35 @@ GET http://localhost:3101/users/1
 content-type: application/json
 ###
 
+POST http://localhost:3101/users/mail
+content-type: application/json
+
+{
+	"email": "grass@rambler.ru"
+}
+###
+POST http://localhost:3101/users/token
+content-type: application/json
+
+{
+	"id": 1,
+	"token": "d1a3b4c5-6e7f-4a89-9b0c-d1e2f3a4b5c6"
+}
+###
+
 POST http://localhost:3101/users
 content-type: application/json
 
 {
-	"login": "guest",
+	"login": "inactive",
 	"password": "",
-	"fio": "Guest",
-	"email":"guest@mail.ru",
-	"token": "k2s4b5c5-6a7f-4a89-9f0c-dae1f3a7b5c8",
+	"fio": "Guest-inactive",
+	"email":"guest-inactive@mail.ru",
+	"token": "",
 	"salt": 80767853454,
 	"token_expare": 12,
 	"permition_id": 1,
-	"active": 1
+	"active": 0
 }
 ###
 

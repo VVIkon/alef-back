@@ -26,7 +26,7 @@ export class UserController {
 
 	@Get()
 	public async getUsers(@Res() res: Response) {
-		const users = await this.usersService.findAll();
+		const users = await this.usersService.getActiveUser();
 		if (!users) {
 			throw new NotFoundException('Users not found');
 		}
@@ -42,6 +42,34 @@ export class UserController {
 		return res.status(HttpStatus.OK).json(user);
 	}
 
+	@Post('mail')
+	public async getUserByEmail(
+		@Res() res: Response,
+		@Body() mail: { email: string },
+	) {
+		const user = await this.usersService.getUserByEmail(mail.email);
+		if (!user) {
+			throw new Error('Нет такого пользователя!');
+		}
+		return res.status(HttpStatus.OK).json(user);
+	}
+	@Post('token')
+	public async getUserByToken(
+		@Res() res: Response,
+		@Body()
+		param: {
+			id: number;
+			token: string;
+		},
+	) {
+		const result = await this.usersService.getUserByToken(
+			param.id,
+			param.token,
+		);
+		return res
+			.status(result ? HttpStatus.OK : HttpStatus.NOT_FOUND)
+			.json({ result });
+	}
 	@Post()
 	public async createUser(
 		@Res() res: Response,
