@@ -1,0 +1,123 @@
+
+
+GET http://localhost:3101/users
+content-type: application/json
+###
+
+GET http://localhost:3101/users/1
+content-type: application/json
+###
+
+POST http://localhost:3101/users
+content-type: application/json
+
+{
+	"login": "guest",
+	"password": "",
+	"fio": "Guest",
+	"email":"guest@mail.ru",
+	"token": "k2s4b5c5-6a7f-4a89-9f0c-dae1f3a7b5c8",
+	"salt": 80767853454,
+	"token_expare": 12,
+	"permition_id": 1,
+	"active": 1
+}
+###
+
+DELETE http://localhost:3000/users/88
+content-type: application/json
+###
+
+
+# -------------- Persons---------------
+
+GET http://localhost:3000/api/docs
+content-type: application/json
+###
+
+GET http://localhost:3000/persons
+content-type: application/json
+###
+
+GET http://localhost:3000/persons/24930
+content-type: application/json
+###
+
+DELETE http://localhost:3000/persons/24555
+content-type: application/json
+###
+
+#---------------- mongoUser --------------
+
+POST http://localhost:3000/mongouser
+content-type: application/json
+
+{
+	"name": "Толик",
+	"status": "не дать не зять",
+	"age": "62",
+	"animalse": [
+		{
+			"dog": "true",
+			"name": "Gaf"
+		},
+		{
+			"cat": "true",
+			"name": "Barsik"
+		},
+		{
+			"cat": "false",
+			"dog": "true",
+			"name": "Мурзик"
+		},
+		{
+			"cat": "false",
+			"dog": "false",
+			"name": "Гули",
+			"birds": [
+				{
+					"name": "Пингвин",
+					"color": "white & black",
+					"wings": "true",
+					"canFlay": "false",
+					"canSwim": "true"
+				},
+				{
+					"name": "Утка",
+					"color": "серая",
+					"wings": "true",
+					"canFlay": "true",
+					"canSwim": "true"
+				},
+				{
+					"name": "Straus",
+					"color": "зелёный",
+					"wings": "true",
+					"canFlay": "false",
+					"canSwim": "false",
+					"canRun": "true"
+				}
+			]
+		}
+	]
+}
+###
+
+GET http://localhost:3000/mongouser
+content-type: application/json
+###
+
+GET http://localhost:3000/mongouser/67fa4bdf9fa60b476c467b9f
+content-type: application/json
+###
+
+#---------------- microservice  --------------
+POST http://localhost:3000/cats
+content-type: application/json
+
+{
+	"data": {
+		"id": 24930
+	}
+}
+###

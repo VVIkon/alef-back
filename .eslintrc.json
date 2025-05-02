@@ -1,0 +1,59 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"extends": [
+		"airbnb-base",
+		"airbnb-typescript/base"
+	],
+	"plugins": [
+		"@typescript-eslint",
+		"jest"
+	],
+	"env": {
+		"node": true,
+		"jest/globals": true
+	},
+	"parserOptions": {
+		"ecmaVersion": 2018,
+		"project": "tsconfig.eslint.json"
+	},
+	"rules": {
+		"no-console": "off",
+		"indent": "off",
+		"@typescript-eslint/indent": ["error", "tab", { "SwitchCase": 1 }],
+		"comma-dangle": "off",
+		"@typescript-eslint/comma-dangle": ["error", "never"],
+		"no-tabs": "off",
+		"arrow-parens": ["error", "as-needed"],
+		"no-await-in-loop": "off",
+		"curly": ["error", "multi-or-nest", "consistent"],
+		"nonblock-statement-body-position": ["error", "any"],
+		"no-plusplus": "off",
+		"no-cond-assign": ["error", "except-parens"],
+		"no-restricted-syntax": [
+			"error",
+			{
+				"selector": "ForInStatement",
+				"message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+			},
+			{
+				"selector": "LabeledStatement",
+				"message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+			},
+			{
+				"selector": "WithStatement",
+				"message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+			}
+		],
+		"function-paren-newline": ["error", "multiline-arguments"],
+		"import/prefer-default-export": "off",
+		"import/no-cycle": "off",
+		"no-empty-function": "off",
+		"@typescript-eslint/no-empty-function": ["error", { "allow": ["private-constructors", "protected-constructors"] }],
+		"@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
+		"prefer-const": ["error", { "destructuring": "all" }],
+		"@typescript-eslint/type-annotation-spacing": "error",
+		"no-shadow": "off",
+		"@typescript-eslint/no-unsafe-return": "off",
+		"@typescript-eslint/no-unsafe-assignment": "off"
+	}
+}
