@@ -81,6 +81,17 @@ export class UserController {
 		}
 		return res.status(HttpStatus.OK).json(user);
 	}
+	@Post('update')
+	public async updateUser(
+		@Res() res: Response,
+		@Body() createUsersDTO: CreateUsersDTO,
+	) {
+		const user = await this.usersService.updateUserByid(createUsersDTO);
+		if (!user) {
+			throw new Error('Что-то сломалось!');
+		}
+		return res.status(HttpStatus.OK).json(user);
+	}
 
 	@Delete(':id')
 	public async deleteUser(@Res() res: Response, @Param('id') id: number) {

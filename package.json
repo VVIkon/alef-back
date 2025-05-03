@@ -18,8 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "ts-node ./node_modules/typeorm/cli -d src/common/db/data-source.ts",
-    "migration:generate": "npm run typeorm -- migration:generate src/common/db/migrations/userTable",
+    "typeorm": "ts-node ./node_modules/typeorm/cli -d src/common/db/env-data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate src/common/db/migrations/createTable",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert"
   },

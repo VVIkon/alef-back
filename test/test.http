@@ -4,7 +4,7 @@ GET http://localhost:3101/users
 content-type: application/json
 ###
 
-GET http://localhost:3101/users/1
+GET http://localhost:3101/users/4
 content-type: application/json
 ###
 
@@ -24,6 +24,22 @@ content-type: application/json
 }
 ###
 
+POST http://localhost:3101/users/update
+content-type: application/json
+
+{
+	"id": 4,
+	"login": "guest",
+	"password": "555",
+	"fio": "Guest",
+	"email": "guest@mail.ru",
+	"token": "k2s4b5c5-6a7f-4a89-9f0c-dae1f3a7b5c8",
+	"salt": 3434343434,
+	"token_expare": 12,
+	"permition_id": 1,
+	"active": 1
+}
+###
 POST http://localhost:3101/users
 content-type: application/json
 

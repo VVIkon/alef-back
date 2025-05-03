@@ -34,4 +34,20 @@ export class UserRepository extends Repository<User> {
 			return false;
 		}
 	}
+	async updateUserByid(user: User): Promise<boolean> {
+		try {
+			const { id, ...userData } = user;
+			console.log(userData);
+			const result = await this.createQueryBuilder()
+				.update('users')
+				.set(userData)
+				.where('id = :id', { id })
+				.execute();
+
+			return !!result.affected;
+		} catch (error) {
+			console.log(error.message);
+			return false;
+		}
+	}
 }

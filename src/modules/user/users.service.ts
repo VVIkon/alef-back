@@ -38,6 +38,9 @@ export class UsersService {
 		const user = this.userRepository.create(userData);
 		return await this.userRepository.save(user);
 	}
+	async updateUserByid(user: User): Promise<User | boolean> {
+		return await this.custUserRepository.updateUserByid(user);
+	}
 	async deleteUser(id: number): Promise<DeleteResult> {
 		const deleteResult = await this.userRepository.delete({ id });
 		return deleteResult;
