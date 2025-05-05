@@ -18,7 +18,7 @@ export class UserRepository extends Repository<User> {
 
 	async getUserByEmail(mail: string): Promise<User | null> {
 		return await this.createQueryBuilder('users')
-			.select(['users.id', 'users.fio', 'users.password'])
+			// .select(['users.id', 'users.fio', 'users.password'])
 			.where('users.email = :mail', { mail })
 			.getOneOrFail();
 	}
@@ -37,6 +37,7 @@ export class UserRepository extends Repository<User> {
 	async updateUserByid(user: User): Promise<boolean> {
 		try {
 			const { id, ...userData } = user;
+			// userData.roles = '{"admin", "owner"}';
 			console.log(userData);
 			const result = await this.createQueryBuilder()
 				.update('users')

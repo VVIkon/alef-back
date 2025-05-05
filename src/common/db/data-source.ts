@@ -14,4 +14,3 @@ export const getDataSource = (configService: ConfigService) => {
 		logging: true, // Логирование запросов
 	});
 };
-

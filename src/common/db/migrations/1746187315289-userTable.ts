@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class UserTable1746187315285 implements MigrationInterface {
-	name = 'UserTable1746187315285';
+export class UserTable1746187315289 implements MigrationInterface {
+	name = 'UserTable1746187315289';
 
 	public async up(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(`CREATE SEQUENCE IF NOT EXISTS "users_id_seq" OWNED BY "users"."id"`);
@@ -31,12 +31,21 @@ export class UserTable1746187315285 implements MigrationInterface {
 		await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "token_expare"`);
 		await queryRunner.query(`ALTER TABLE "users" ADD "token_expare" int8 DEFAULT 1 NOT NULL`);
 
-		await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "permition_id"`);
-		await queryRunner.query(`ALTER TABLE "users" ADD "permition_id" int8 DEFAULT 1 NOT NULL`);
+		await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "roles"`);
+		await queryRunner.query(`ALTER TABLE "users" ADD "roles" TEXT[] NOT NULL DEFAULT '{"user"}'`);
 
 		await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "active"`);
 		await queryRunner.query(`ALTER TABLE "users" ADD "active" int4 DEFAULT 0 NOT NULL`);
+
+		await queryRunner.query(`DELETE FROM "users"`);
+
+		await queryRunner.query(`INSERT INTO "users" ("login", "password", "fio", "email", "token", "salt", "token_expare", "roles", "active") VALUES ('grass', 'grass', 'Grass Hopper', 'grass@mail.com', '23wd4tg23qw42dd34', '234234234234', 128, '{"admin", "owner"}', 1)`);
+		await queryRunner.query(`INSERT INTO "users" ("login", "password", "fio", "email", "token", "salt", "token_expare", "roles", "active") VALUES ('admin', 'admin', 'Admmin Admin', 'admin@mail.com', '23wd4tg23qw42dd34', '2344', '128', '{"admin"}', 1)`);
+		await queryRunner.query(`INSERT INTO "users" ("login", "password", "fio", "email", "token", "salt", "token_expare", "roles", "active") VALUES ('user', 'user', 'User User', 'user@mail.com', '23wd4tg23qw42dd34', '2342342342', '128', '{"user"}', 1)`);
+		await queryRunner.query(`INSERT INTO "users" ("login", "password", "fio", "email", "token", "salt", "token_expare", "roles", "active") VALUES ('guest', 'guest', 'Guest', 'guest@mail.com', '23wd4tg23qw42dd34', '2323232', '128', '{"guest"}', 1)`);
 	}
+
+
 
 	public async down(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "fio"`);

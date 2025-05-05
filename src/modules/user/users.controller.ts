@@ -6,6 +6,7 @@ import {
 	UseFilters,
 	HttpStatus,
 	Param,
+	UseGuards,
 	// HttpCode,
 	NotFoundException,
 	// Param,
@@ -18,6 +19,7 @@ import { UsersService } from './users.service';
 import { Response } from 'express';
 import { AllExceptionsFilter } from '../../common/filters/HttpExceptionFilter';
 import { CreateUsersDTO } from '../user/DTO/createUsers.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 @UseFilters(AllExceptionsFilter)
@@ -33,6 +35,7 @@ export class UserController {
 		res.status(200).json(users);
 	}
 
+	@UseGuards(AuthGuard('jwt'))
 	@Get(':id')
 	public async getUser(@Res() res: Response, @Param('id') id: number) {
 		const user = await this.usersService.findById(id);

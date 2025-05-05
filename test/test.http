@@ -4,8 +4,9 @@ GET http://localhost:3101/users
 content-type: application/json
 ###
 
-GET http://localhost:3101/users/4
+GET http://localhost:3101/users/11
 content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYXNzQG1haWwuY29tIiwic3ViIjoxMSwicm9sZXMiOlsiYWRtaW4iLCJvd25lciIsInN1cGVydXNlciJdLCJhY3RpdmUiOjEsImZpbyI6IkdyYXNzIEhvcHBlciIsImlhdCI6MTc0NjQ1NjU1NiwiZXhwIjoxNzQ2NDYwMTU2fQ.YouzMzN0f7zpxlbwTovf9BlT43F9OxQGsH7UVT-TUq4
 ###
 
 POST http://localhost:3101/users/mail
@@ -28,15 +29,19 @@ POST http://localhost:3101/users/update
 content-type: application/json
 
 {
-	"id": 4,
-	"login": "guest",
-	"password": "555",
-	"fio": "Guest",
-	"email": "guest@mail.ru",
+	"id": 11,
+	"login": "grass",
+    "password": "grass",
+    "fio": "Grass Hopper",
+    "email": "grass@mail.com",
 	"token": "k2s4b5c5-6a7f-4a89-9f0c-dae1f3a7b5c8",
 	"salt": 3434343434,
 	"token_expare": 12,
-	"permition_id": 1,
+	"roles": [
+		"admin",
+		"owner",
+		"superuser"
+		],
 	"active": 1
 }
 ###
@@ -45,13 +50,15 @@ content-type: application/json
 
 {
 	"login": "inactive",
-	"password": "",
+	"password": "inactive",
 	"fio": "Guest-inactive",
 	"email":"guest-inactive@mail.ru",
-	"token": "",
+	"token": "qqweqweqwe",
 	"salt": 80767853454,
 	"token_expare": 12,
-	"permition_id": 1,
+	"roles": [
+		"guest"
+		],
 	"active": 0
 }
 ###
@@ -60,96 +67,23 @@ DELETE http://localhost:3000/users/88
 content-type: application/json
 ###
 
+# -------------- Auth ---------------
+
+POST http://localhost:3101/auth/login
+content-type: application/json
+
+{
+	"email": "grass@mail.com",
+	"id": 11,
+	"password": "grass"
+}
+###
+
+GET http://localhost:3101/auth/profile
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdyYXNzQG1haWwuY29tIiwic3ViIjoxMSwicm9sZXMiOlsiYWRtaW4iLCJvd25lciIsInN1cGVydXNlciJdLCJhY3RpdmUiOjEsImZpbyI6IkdyYXNzIEhvcHBlciIsImlhdCI6MTc0NjQ1NjU1NiwiZXhwIjoxNzQ2NDYwMTU2fQ.YouzMzN0f7zpxlbwTovf9BlT43F9OxQGsH7UVT-TUq4
+###
 
 # -------------- Persons---------------
 
-GET http://localhost:3000/api/docs
-content-type: application/json
-###
 
-GET http://localhost:3000/persons
-content-type: application/json
-###
-
-GET http://localhost:3000/persons/24930
-content-type: application/json
-###
-
-DELETE http://localhost:3000/persons/24555
-content-type: application/json
-###
-
-#---------------- mongoUser --------------
-
-POST http://localhost:3000/mongouser
-content-type: application/json
-
-{
-	"name": "Толик",
-	"status": "не дать не зять",
-	"age": "62",
-	"animalse": [
-		{
-			"dog": "true",
-			"name": "Gaf"
-		},
-		{
-			"cat": "true",
-			"name": "Barsik"
-		},
-		{
-			"cat": "false",
-			"dog": "true",
-			"name": "Мурзик"
-		},
-		{
-			"cat": "false",
-			"dog": "false",
-			"name": "Гули",
-			"birds": [
-				{
-					"name": "Пингвин",
-					"color": "white & black",
-					"wings": "true",
-					"canFlay": "false",
-					"canSwim": "true"
-				},
-				{
-					"name": "Утка",
-					"color": "серая",
-					"wings": "true",
-					"canFlay": "true",
-					"canSwim": "true"
-				},
-				{
-					"name": "Straus",
-					"color": "зелёный",
-					"wings": "true",
-					"canFlay": "false",
-					"canSwim": "false",
-					"canRun": "true"
-				}
-			]
-		}
-	]
-}
-###
-
-GET http://localhost:3000/mongouser
-content-type: application/json
-###
-
-GET http://localhost:3000/mongouser/67fa4bdf9fa60b476c467b9f
-content-type: application/json
-###
-
-#---------------- microservice  --------------
-POST http://localhost:3000/cats
-content-type: application/json
-
-{
-	"data": {
-		"id": 24930
-	}
-}
-###

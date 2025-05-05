@@ -26,7 +26,7 @@ export class CreateUsersDTO {
 	token_expare: number;
 
 	@ApiProperty()
-	permition_id: number;
+	roles: string[];
 
 	@ApiProperty()
 	active: number;

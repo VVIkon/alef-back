@@ -26,8 +26,12 @@ export class User {
 	@Column()
 	token_expare: number;
 
-	@Column()
-	permition_id: number;
+	@Column({
+		type: 'text', // тупой ORM не понимает тип TEXT[]
+		array: true,
+		default: '{}',
+	})
+	roles: string[];
 
 	@Column()
 	active: number;

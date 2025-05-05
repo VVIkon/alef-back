@@ -5,6 +5,7 @@ import { getDataSource } from './common/db/data-source';
 
 import { UserController } from './modules/user/users.controller';
 import { UsersModule } from './modules/user/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
 	controllers: [UserController],
@@ -22,6 +23,7 @@ import { UsersModule } from './modules/user/users.module';
 				return dataSource.options;
 			},
 		}),
+		AuthModule,
 	],
 	providers: [],
 })
