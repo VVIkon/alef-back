@@ -18,8 +18,12 @@ export class UserRepository extends Repository<User> {
 
 	async getUserByEmail(mail: string): Promise<User | null> {
 		return await this.createQueryBuilder('users')
-			// .select(['users.id', 'users.fio', 'users.password'])
 			.where('users.email = :mail', { mail })
+			.getOneOrFail();
+	}
+	async getUserByLogin(login: string): Promise<User | null> {
+		return await this.createQueryBuilder('users')
+			.where('users.login = :login', { login })
 			.getOneOrFail();
 	}
 

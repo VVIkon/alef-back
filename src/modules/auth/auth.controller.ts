@@ -23,7 +23,6 @@ import { Response } from 'express';
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
-
 	@UseGuards(AuthGuard('local'))
 	@Post('login')
 	login(@Request() req) {

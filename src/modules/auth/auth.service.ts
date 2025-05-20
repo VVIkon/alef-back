@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../user/users.service';
+import { UtilsService } from '../../common/utils/utils.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/common/db/entities/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -10,21 +12,26 @@ export class AuthService {
 		private jwtService: JwtService,
 	) {}
 
-	async validateUser(email: string, pass: string): Promise<any> {
-		const user = await this.usersService.getUserByEmail(email);
-		if (user && (await bcrypt.compare(pass, user.password))) {
+	async validateUser(name: string, pass: string): Promise<any> {
+		let user: User | null = null;
+		if (UtilsService.isEmail(name)) {
+			user = await this.usersService.getUserByEmail(name);
+		} else {
+			user = await this.usersService.getUserByEmail(name);
+		}
+		if (user && (await bcrypt.compare(pass, user?.password))) {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { password, ...result } = user;
 			return result;
 		}
 		return null;
 	}
-
+	// Это то что будет завёрнуто в токен
 	login(user: any) {
 		try {
 			const payload = {
-				email: user.email,
 				sub: user.id,
+				email: user.email,
 				roles: user.roles,
 				active: user.active,
 				fio: user.fio,

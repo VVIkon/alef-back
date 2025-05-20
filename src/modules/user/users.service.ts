@@ -22,6 +22,10 @@ export class UsersService {
 		const user = await this.custUserRepository.getUserByEmail(mail);
 		return user;
 	}
+	async getUserByLogin(login: string): Promise<User | null> {
+		const user = await this.custUserRepository.getUserByLogin(login);
+		return user;
+	}
 
 	async getUserByToken(id: number, token: string): Promise<boolean> {
 		const result = await this.custUserRepository.checkUserByToken(
