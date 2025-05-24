@@ -80,7 +80,7 @@ content-type: application/json
 
 GET http://localhost:3101/auth/profile
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJlbWFpbCI6ImdyYXNzQG1haWwuY29tIiwicm9sZXMiOlsiYWRtaW4iLCJvd25lciIsInN1cGVydXNlciJdLCJhY3RpdmUiOjEsImZpbyI6IkdyYXNzIEhvcHBlciIsImlhdCI6MTc0NzczMTc3NSwiZXhwIjoxNzQ3NzM1Mzc1fQ.HVPtWMO26PqCIUMmmZtm7LMBNpO6qta5pyQQLo6icEw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJlbWFpbCI6ImdyYXNzQG1haWwuY29tIiwicm9sZXMiOlsiYWRtaW4iLCJvd25lciIsInN1cGVydXNlciJdLCJhY3RpdmUiOjEsImZpbyI6IkdyYXNzIEhvcHBlciIsImlhdCI6MTc0Nzc1MzA1OSwiZXhwIjoxNzQ3NzU2NjU5fQ._LSlfkJLQitRMiA5x8u8iaWBg5XgMAnILtK3DkH2Skk
 ###
 
 # -------------- Persons---------------

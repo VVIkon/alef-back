@@ -13,11 +13,13 @@ export class AuthService {
 	) {}
 
 	async validateUser(name: string, pass: string): Promise<any> {
+		// console.log(`name:`, name);
+		// console.log(`pass:`, pass);
 		let user: User | null = null;
 		if (UtilsService.isEmail(name)) {
 			user = await this.usersService.getUserByEmail(name);
 		} else {
-			user = await this.usersService.getUserByEmail(name);
+			user = await this.usersService.getUserByLogin(name);
 		}
 		if (user && (await bcrypt.compare(pass, user?.password))) {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
