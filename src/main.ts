@@ -7,6 +7,7 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 import { AllExceptionsFilter } from './common/filters/HttpExceptionFilter';
 import { QueryFailedFilter } from './common/filters/query-failed.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 export async function bootstrap(): Promise<NestExpressApplication> {
 	initializeTransactionalContext();
@@ -21,6 +22,10 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 		new AllExceptionsFilter(),
 		new QueryFailedFilter(reflector),
 	);
+	app.useWebSocketAdapter(new WsAdapter(app));
+	// const jwtService = app.get(JwtService);
+	// app.useWebSocketAdapter(new WsAdapter(app, jwtService));
+
 	// Настройка Swagger
 	const configSwager = new DocumentBuilder()
 		.setTitle('VI Nest')

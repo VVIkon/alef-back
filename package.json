@@ -32,8 +32,11 @@
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.13",
+    "@nestjs/platform-socket.io": "^11.1.2",
+    "@nestjs/platform-ws": "^11.1.2",
     "@nestjs/swagger": "^11.1.1",
     "@nestjs/typeorm": "^11.0.0",
+    "@nestjs/websockets": "^11.1.2",
     "@types/knex": "^0.15.2",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
@@ -53,8 +56,10 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "save": "^2.9.0",
+    "socket.io": "^4.8.1",
     "typeorm": "^0.3.22",
-    "typeorm-transactional": "^0.5.0"
+    "typeorm-transactional": "^0.5.0",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

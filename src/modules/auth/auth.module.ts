@@ -7,6 +7,7 @@ import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { WebSocketGateWay } from '../ws/websocket.gateway';
 
 @Module({
 	imports: [
@@ -19,7 +20,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 				secret: configService.get<string>('JWT_SECRET_KEY'),
 				signOptions: {
 					// algorithm: 'RS256',
-					expiresIn: configService.get<string>('JWT_EXPIRATION_TIME'),
+					expiresIn: `${configService.get<number>('JWT_EXPIRATION_TIME') || 1}d`,
 				},
 				// verifyOptions: {
 				// 	algorithms: ['RS256'],
@@ -27,8 +28,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 			}),
 		}),
 	],
-	providers: [AuthService, LocalStrategy, JwtStrategy],
+	providers: [AuthService, LocalStrategy, JwtStrategy, WebSocketGateWay],
 	controllers: [AuthController],
-	exports: [AuthService],
+	exports: [AuthService, WebSocketGateWay],
 })
 export class AuthModule {}

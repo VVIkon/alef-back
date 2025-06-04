@@ -4,12 +4,15 @@ import { UtilsService } from '../../common/utils/utils.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/common/db/entities/users.entity';
+import { ConfigService } from '@nestjs/config';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
+		private readonly configService: ConfigService,
 	) {}
 
 	async validateUser(name: string, pass: string): Promise<any> {
@@ -31,7 +34,7 @@ export class AuthService {
 	// Это то что будет завёрнуто в токен
 	login(user: any) {
 		try {
-			const payload = {
+			const payload: JwtPayload = {
 				sub: user.id,
 				email: user.email,
 				roles: user.roles,
@@ -39,9 +42,15 @@ export class AuthService {
 				fio: user.fio,
 			};
 			const access_token = this.jwtService.sign(payload);
-			return { access_token };
+			const expires =
+				this.configService.get<number>('JWT_EXPIRATION_TIME') || 1;
+			return { access_token, expires };
 		} catch (error) {
 			console.log(error.message);
 		}
+	}
+
+	async verifyToken(token: string): Promise<JwtPayload> {
+		return await this.jwtService.verify(token);
 	}
 }

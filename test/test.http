@@ -29,20 +29,18 @@ POST http://localhost:3101/users/update
 content-type: application/json
 
 {
-	"id": 11,
-	"login": "grass",
-    "password": "grass",
-    "fio": "Grass Hopper",
-    "email": "grass@mail.com",
-	"token": "k2s4b5c5-6a7f-4a89-9f0c-dae1f3a7b5c8",
-	"salt": 3434343434,
-	"token_expare": 12,
-	"roles": [
-		"admin",
-		"owner",
-		"superuser"
-		],
-	"active": 1
+	"id": 14,
+    "login": "guest",
+    "password": "guest",
+    "fio": "Guest",
+    "email": "guest@mail.com",
+    "token": "23wd4tg23qw42dd34",
+    "salt": 2323232,
+    "token_expare": 128,
+    "roles": [
+      "guest"
+    ],
+    "active": 1
 }
 ###
 POST http://localhost:3101/users
