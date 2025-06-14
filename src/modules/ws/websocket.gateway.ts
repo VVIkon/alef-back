@@ -16,6 +16,10 @@ import { WsJwtGuard } from '../auth/ws-jwt.guard';
 
 @WebSocketGateway(8080, {
 	path: '/ws',
+	cors: {
+		origin: '*',
+	},
+
 	transports: ['websocket'],
 })
 export class WebSocketGateWay
@@ -27,7 +31,8 @@ export class WebSocketGateWay
 	private logger: Logger = new Logger('WebSocketGateway');
 	private clients: Map<string, AuthenticatedWebSocket> = new Map();
 
-	handleConnection(client: AuthenticatedWebSocket) {
+	handleConnection() {
+	// handleConnection(client: AuthenticatedWebSocket) {
 		this.logger.log(`client connected`);
 	}
 	handleDisconnect(client: AuthenticatedWebSocket) {

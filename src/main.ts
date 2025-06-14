@@ -23,8 +23,6 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 		new QueryFailedFilter(reflector),
 	);
 	app.useWebSocketAdapter(new WsAdapter(app));
-	// const jwtService = app.get(JwtService);
-	// app.useWebSocketAdapter(new WsAdapter(app, jwtService));
 
 	// Настройка Swagger
 	const configSwager = new DocumentBuilder()

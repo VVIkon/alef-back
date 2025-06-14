@@ -21,18 +21,8 @@ export class WsJwtGuard implements CanActivate {
 			client.user = payload;
 			return !!payload;
 		} catch (err) {
+			console.log('verifyToken Error: ', err.messgae);
 			throw new WsException('Unauthorized');
 		}
 	}
-
-	// private extractToken(client: any): string | null {
-	// 	const open = client.handshake;
-	// 	console.log(open);
-	// 	if (client.handshake?.headers?.authorization) {
-	// 		const [type, token] =
-	// 			client.handshake.headers.authorization.split(' ');
-	// 		return type === 'Bearer' ? token : null;
-	// 	}
-	// 	return null;
-	// }
 }
