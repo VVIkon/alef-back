@@ -49,8 +49,4 @@ export class AuthService {
 			console.log(error.message);
 		}
 	}
-
-	async verifyToken(token: string): Promise<JwtPayload> {
-		return await this.jwtService.verify(token);
-	}
 }

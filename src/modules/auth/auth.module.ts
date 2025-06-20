@@ -7,7 +7,9 @@ import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { WebSocketGateWay } from '../ws/websocket.gateway';
+// import { WebSocketGateWay } from '../ws/ws.gateway';
+// import { MessendoService } from '../messendo/messendo.service';
+// import { RoomRepository } from '../messendo/room.repository';
 
 @Module({
 	imports: [
@@ -28,8 +30,8 @@ import { WebSocketGateWay } from '../ws/websocket.gateway';
 			}),
 		}),
 	],
-	providers: [AuthService, LocalStrategy, JwtStrategy, WebSocketGateWay],
+	providers: [AuthService, LocalStrategy, JwtStrategy],
 	controllers: [AuthController],
-	exports: [AuthService, WebSocketGateWay],
+	exports: [AuthService],
 })
 export class AuthModule {}

@@ -28,10 +28,7 @@ export class UsersService {
 	}
 
 	async getUserByToken(id: number, token: string): Promise<boolean> {
-		const result = await this.custUserRepository.checkUserByToken(
-			id,
-			token,
-		);
+		const result = await this.custUserRepository.checkUserByToken(id, token);
 		return result;
 	}
 

@@ -9,10 +9,10 @@ import {
 } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Server, WebSocket } from 'ws';
-// import { AuthGuard } from '@nestjs/passport';
 import { AuthenticatedWebSocket } from './interfaces/authenticated-websocket.interface';
 import { WebSocketMessage } from './interfaces/websocket-message.interface';
 import { WsJwtGuard } from '../auth/ws-jwt.guard';
+import { MessendoService } from '../messendo/messendo.service';
 
 @WebSocketGateway(8080, {
 	path: '/ws',
@@ -31,8 +31,12 @@ export class WebSocketGateWay
 	private logger: Logger = new Logger('WebSocketGateway');
 	private clients: Map<string, AuthenticatedWebSocket> = new Map();
 
+	constructor(
+		private messendoService: MessendoService,
+		// private readonly configService: ConfigService,
+	) {}
+
 	handleConnection() {
-	// handleConnection(client: AuthenticatedWebSocket) {
 		this.logger.log(`client connected`);
 	}
 	handleDisconnect(client: AuthenticatedWebSocket) {
@@ -43,7 +47,6 @@ export class WebSocketGateWay
 		}
 	}
 
-	// @UseGuards(AuthGuard('jwt'))
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('authenticate')
 	handleAuth(@ConnectedSocket() client: AuthenticatedWebSocket) {
@@ -57,20 +60,57 @@ export class WebSocketGateWay
 		return { event: 'authenticated', data };
 	}
 
-	// @UseGuards(AuthGuard('jwt'))
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('sendMessage')
 	handleMessage(
 		@ConnectedSocket() client: AuthenticatedWebSocket,
 		@MessageBody() data: any,
 	) {
-		// console.log('>>> data: ', data);
-		this.broadcast('newMessage', {
+		const senderId = data?.senderId || 0
+		this.sendToUser(senderId, 'newMessage', data);
+	}
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('getRoomProfile')
+	async getRoomProfile(
+		@ConnectedSocket() client: AuthenticatedWebSocket,
+		@MessageBody() data: any,
+	) {
+		if (data.message !== 'getRoomProfile') {
+			return this.broadcast('roomProfile', {
+				userId: client?.user?.sub || '',
+				username: client?.user?.fio || '',
+				message: '',
+			});
+		}
+		const roomOwnerId = Number(client?.user?.sub) || 0;
+		const roomProfile = await this.messendoService.getRoom(roomOwnerId);
+
+		this.broadcast('roomProfile', {
 			userId: client?.user?.sub || '',
 			username: client?.user?.fio || '',
-			message: data.message,
+			message: roomProfile || '',
 		});
 	}
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('getGroupContent')
+	async getGroupContent(
+		@ConnectedSocket() client: AuthenticatedWebSocket,
+		@MessageBody() data: any,
+	) {
+		if (!data || data.message !== 'getGroupContent') {
+			return this.broadcast('getGroupContent', {
+				userId: client?.user?.sub || '',
+				username: client?.user?.fio || '',
+				message: '',
+			});
+		}
+		const groupId = data?.groupId || 0;
+		data.message = await this.messendoService.getGroupContent(groupId);
+		const authUserId = data.authUserId;
+		this.sendToUser(authUserId, 'groupContent', data);
+	}
+
+	//------------------- senders -------------------------------------
 
 	private broadcast(event: string, data: any): void {
 		const message: WebSocketMessage = { event, data };
@@ -81,8 +121,8 @@ export class WebSocketGateWay
 		});
 	}
 
-	sendToUser(userId: string, event: string, data: any): boolean {
-		const client = this.clients.get(userId);
+	private sendToUser(userderId: string, event: string, data: any): boolean {
+		const client = this.clients.get(userderId);
 		// if (client && client.readyState && client.readyState === WebSocket.OPEN) {
 		if (client) {
 			const message: WebSocketMessage = { event, data };

@@ -10,6 +10,7 @@ export class UserRepository extends Repository<User> {
 
 	// active
 	async getActiveUsers(status: number = 1): Promise<User[]> {
+		if (!status) return [];
 		return await this.createQueryBuilder('users')
 			.where('users.active = :isActive', { isActive: status })
 			.orderBy('users.id')
@@ -17,17 +18,20 @@ export class UserRepository extends Repository<User> {
 	}
 
 	async getUserByEmail(mail: string): Promise<User | null> {
+		if (!mail) return null;
 		return await this.createQueryBuilder('users')
 			.where('users.email = :mail', { mail })
 			.getOneOrFail();
 	}
 	async getUserByLogin(login: string): Promise<User | null> {
+		if (!login) return null;
 		return await this.createQueryBuilder('users')
 			.where('users.login = :login', { login })
 			.getOneOrFail();
 	}
 
 	async checkUserByToken(id: number, token: string): Promise<boolean> {
+		if (!id) return false;
 		try {
 			const result = await this.createQueryBuilder('users')
 				.where('users.id = :id and users.token = :token', { id, token })
@@ -36,6 +40,20 @@ export class UserRepository extends Repository<User> {
 		} catch (error) {
 			console.log(error.message);
 			return false;
+		}
+	}
+	async getUsers(ids: number[]): Promise<User[] | null> {
+		if (!ids?.length) return null;
+		try {
+			const result = await this.createQueryBuilder('users')
+				.where('users.id IN (:...ids)', { ids })
+				.andWhere('users.active = 1')
+				.getMany();
+
+			return result;
+		} catch (error) {
+			console.log(error.message);
+			return null;
 		}
 	}
 	async updateUserByid(user: User): Promise<boolean> {
