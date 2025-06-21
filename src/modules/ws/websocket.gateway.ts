@@ -1,12 +1,4 @@
-import {
-	WebSocketGateway,
-	WebSocketServer,
-	OnGatewayConnection,
-	OnGatewayDisconnect,
-	SubscribeMessage,
-	MessageBody,
-	ConnectedSocket,
-} from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, MessageBody, ConnectedSocket } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Server, WebSocket } from 'ws';
 import { AuthenticatedWebSocket } from './interfaces/authenticated-websocket.interface';
@@ -19,12 +11,9 @@ import { MessendoService } from '../messendo/messendo.service';
 	cors: {
 		origin: '*',
 	},
-
-	transports: ['websocket'],
+	// transports: ['websocket'],
 })
-export class WebSocketGateWay
-	implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
@@ -36,13 +25,14 @@ export class WebSocketGateWay
 		// private readonly configService: ConfigService,
 	) {}
 
-	handleConnection() {
-		this.logger.log(`client connected`);
+	handleConnection(client: AuthenticatedWebSocket) {
+		this.logger.log(`handleConnection. Client connected: ${client}`);
+		// console.trace(); // Это поможет понять, откуда приходит соединение
 	}
 	handleDisconnect(client: AuthenticatedWebSocket) {
 		if (client.user) {
 			this.clients.delete(client.user.sub);
-			this.logger.log(`Client disconnected: ${client.user.fio}`);
+			this.logger.log(`handleDisconnect. Client disconnected: ${client.user.fio}`);
 			this.broadcast('userDisconnected', { userId: client.user.sub });
 		}
 	}
@@ -51,10 +41,13 @@ export class WebSocketGateWay
 	@SubscribeMessage('authenticate')
 	handleAuth(@ConnectedSocket() client: AuthenticatedWebSocket) {
 		let data = {};
+		const userId = client.user?.sub;
+		if (!userId) return;
+
 		if (client?.user?.sub) {
 			const user = client.user;
 			this.clients.set(user.sub || '', client);
-			this.logger.log(`Client authenticated: ${user.fio || ''}`);
+			this.logger.log(`handleAuth. Client authenticated: ${user.fio || ''}`);
 			data = { success: true, user };
 		}
 		return { event: 'authenticated', data };
@@ -62,19 +55,15 @@ export class WebSocketGateWay
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('sendMessage')
-	handleMessage(
-		@ConnectedSocket() client: AuthenticatedWebSocket,
-		@MessageBody() data: any,
-	) {
-		const senderId = data?.senderId || 0
+	async handleMessage(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
+		const senderId = data?.senderId || 0;
+		await this.messendoService.insertToGroupContent(data);
 		this.sendToUser(senderId, 'newMessage', data);
 	}
+
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('getRoomProfile')
-	async getRoomProfile(
-		@ConnectedSocket() client: AuthenticatedWebSocket,
-		@MessageBody() data: any,
-	) {
+	async getRoomProfile(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
 		if (data.message !== 'getRoomProfile') {
 			return this.broadcast('roomProfile', {
 				userId: client?.user?.sub || '',
@@ -93,10 +82,7 @@ export class WebSocketGateWay
 	}
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('getGroupContent')
-	async getGroupContent(
-		@ConnectedSocket() client: AuthenticatedWebSocket,
-		@MessageBody() data: any,
-	) {
+	async getGroupContent(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
 		if (!data || data.message !== 'getGroupContent') {
 			return this.broadcast('getGroupContent', {
 				userId: client?.user?.sub || '',
@@ -123,7 +109,6 @@ export class WebSocketGateWay
 
 	private sendToUser(userderId: string, event: string, data: any): boolean {
 		const client = this.clients.get(userderId);
-		// if (client && client.readyState && client.readyState === WebSocket.OPEN) {
 		if (client) {
 			const message: WebSocketMessage = { event, data };
 			client.send(JSON.stringify(message));

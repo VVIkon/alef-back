@@ -34,4 +34,19 @@ export class ContentRepository extends Repository<Content> {
 			.getRawMany();
 		return groupProfile || null;
 	}
+
+		async InsertToGroupContent(msgToContent): Promise<void> {
+			if (!msgToContent) return;
+			await this.createQueryBuilder()
+    			.insert()
+    			.into(Content)
+				.values({
+					groupId: msgToContent.groupId,
+					userId: msgToContent.userId,
+					message: msgToContent.message,
+					active: 1,
+				})
+				.execute()
+		}
+
 }

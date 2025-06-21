@@ -23,9 +23,6 @@ import { JwtService } from '@nestjs/jwt';
 			Room,
 			Group,
 			Content,
-			// RoomRepository,
-			// GroupRepository,
-			// UserRepository
 		])],
 	providers: [
 		{
@@ -49,23 +46,12 @@ import { JwtService } from '@nestjs/jwt';
 			inject: [DataSource],
 		},
 		MessendoService,
-		// UserRepository,
 		UsersService,
-		// RoomRepository,
-		// GroupRepository,
-		WebSocketGateWay,
-		AuthService,
 		JwtService
 	],
 	controllers: [],
 	exports: [
 		MessendoService,
-		// UserRepository,
-		// UsersService,
-		// RoomRepository,
-		// GroupRepository,
-		// WebSocketGateWay,
-		// AuthService,
 		JwtService
 	],
 })

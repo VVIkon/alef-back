@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { AuthService } from '../auth/auth.service';
+// import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { WsException } from '@nestjs/websockets';
 import { JwtService } from '@nestjs/jwt';
@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class WsJwtGuard extends AuthGuard('jwt') implements CanActivate {
 	constructor(
-		private authService: AuthService,
+		// private authService: AuthService,
 		private jwtService: JwtService,
 	) {
 		super();
@@ -20,16 +20,19 @@ export class WsJwtGuard extends AuthGuard('jwt') implements CanActivate {
 		const token = String(data?.token) || '';
 
 		if (!token) {
-			throw new WsException('Unauthorized');
+			return false;
+			// throw new WsException('Unauthorized');
 		}
 
 		try {
 			const payload = await this.jwtService.decode(token);
 			client.user = payload;
-			return !!payload;
+			return true;
+			// return !!payload;
 		} catch (err) {
 			console.log('verifyToken Error: ', err);
-			throw new WsException('Unauthorized');
+			return false;
+			// throw new WsException('Unauthorized');
 		}
 	}
 }

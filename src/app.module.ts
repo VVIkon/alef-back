@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getDataSource } from './common/db/data-source';
@@ -27,7 +27,7 @@ import { WebSocketModule } from './modules/ws/websocket.module';
 			},
 		}),
 		AuthModule,
-		WebSocketModule,
+		forwardRef(() => WebSocketModule),
 	],
 	providers: [],
 })

@@ -83,4 +83,20 @@ export class MessendoService {
 			return null;
 		}
 	}
+	async insertToGroupContent(msgData): Promise<boolean> {
+		if (!msgData) return false;
+		try {
+			const msgToContent = {
+				groupId: msgData.sendToGroup,
+				userId: msgData.senderId,
+				message: msgData.message,
+			}
+
+			await this.custContentRepository.InsertToGroupContent(msgToContent);
+			return true;
+		} catch (error) {
+			console.error('MessendoService.insertToGroupContent Error: ', error);
+			return false;
+		}
+	}
 }

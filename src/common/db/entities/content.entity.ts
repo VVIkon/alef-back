@@ -8,14 +8,14 @@ export class Content {
 	@Column()
 	groupId: number;
 
-	@Column()
-	groupName: string;
+	// @Column()
+	// groupName?: string;
 
 	@Column()
 	userId: number;
 
-	@Column()
-	userName: string;
+	// @Column()
+	// userName?: string;
 
 	@Column({
 		type: 'text',
