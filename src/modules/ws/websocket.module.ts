@@ -4,8 +4,7 @@ import { MessendoModule } from '../messendo/messendo.module';
 
 @Module({
 	imports: [
-		MessendoModule
-		// forwardRef(() => MessendoModule)
+		forwardRef(() => MessendoModule)
 	],
 	providers: [WebSocketGateWay],
 	// exports: [WebSocketGateWay],

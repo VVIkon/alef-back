@@ -23,10 +23,10 @@ export class ContentRepository extends Repository<Content> {
 				'u.fio as userName',
 				'c.message as message',
 				'c.active as active',
-				'c.dateCreate as dateCreate'
+				'c.dateCreate as dateCreate',
 			])
-		    .leftJoin(User, 'u', 'u.id = c.userId')
-		    .leftJoin(Group, 'g', 'g.id = c.groupId')
+			.leftJoin(User, 'u', 'u.id = c.userId')
+			.leftJoin(Group, 'g', 'g.id = c.groupId')
 			.where('c.groupId = :contentsGroupId', { contentsGroupId })
 			.andWhere('c.active = 1')
 			.orderBy('c.id')
@@ -35,18 +35,17 @@ export class ContentRepository extends Repository<Content> {
 		return groupProfile || null;
 	}
 
-		async InsertToGroupContent(msgToContent): Promise<void> {
-			if (!msgToContent) return;
-			await this.createQueryBuilder()
-    			.insert()
-    			.into(Content)
-				.values({
-					groupId: msgToContent.groupId,
-					userId: msgToContent.userId,
-					message: msgToContent.message,
-					active: 1,
-				})
-				.execute()
-		}
-
+	async InsertToGroupContent(msgToContent): Promise<void> {
+		if (!msgToContent) return;
+		await this.createQueryBuilder()
+			.insert()
+			.into(Content)
+			.values({
+				groupId: msgToContent.groupId,
+				userId: msgToContent.userId,
+				message: msgToContent.message,
+				active: 1,
+			})
+			.execute();
+	}
 }

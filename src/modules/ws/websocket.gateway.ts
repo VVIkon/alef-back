@@ -11,7 +11,7 @@ import { MessendoService } from '../messendo/messendo.service';
 	cors: {
 		origin: '*',
 	},
-	// transports: ['websocket'],
+	transports: ['websocket'],
 })
 export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
@@ -94,6 +94,21 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 		data.message = await this.messendoService.getGroupContent(groupId);
 		const authUserId = data.authUserId;
 		this.sendToUser(authUserId, 'groupContent', data);
+	}
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('createNewRoom')
+	async createNewRoom(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
+		const userId = client?.user?.sub || '0';
+		const username = client?.user?.fio || '';
+		if (!data || data.message !== 'createNewRoom') {
+			return this.broadcast('newRoom', {
+				userId,
+				username,
+				message: '',
+			});
+		}
+		data.message = await this.messendoService.createNewRoom(Number(userId), username);
+		this.sendToUser(userId, 'newRoom', data);
 	}
 
 	//------------------- senders -------------------------------------

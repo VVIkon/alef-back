@@ -16,4 +16,20 @@ export class RoomRepository extends Repository<Room> {
 			.getOneOrFail();
 		return room || null;
 	}
+
+	public async InsertNewProfile(userId: number, groupUserName: string, ids: number[]): Promise<void> {
+		if (!userId) return;
+		await this.createQueryBuilder()
+			.insert()
+			.into(Room)
+			.values({
+				name: `${groupUserName} Group`,
+				userId,
+				groups: ids || [],
+				users: [],
+				channels: [],
+				active: 1,
+			})
+			.execute();
+	}
 }

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '../../common/db/entities/users.entity';
 import { Room } from '../../common/db/entities/room.entity';
 import { Group } from '../../common/db/entities/group.entity';
-import { Content} from '../../common/db/entities/content.entity';
+import { Content } from '../../common/db/entities/content.entity';
 import { RoomRepository } from './room.repository';
 import { GroupRepository } from './group.repository';
 import { UserRepository } from '../user/user.repository';
@@ -38,9 +38,7 @@ export class MessendoService {
 		try {
 			const groupProfile = await this.custGroupRepository.getGroupProfile([groupId]);
 			if (groupProfile && groupProfile.length) {
-				await Promise.all(
-					groupProfile?.map(async grp => grp.users = await this.custUserRepository.getUsers(grp.users as number[] ))
-				)
+				await Promise.all(groupProfile?.map(async (grp) => (grp.users = await this.custUserRepository.getUsers(grp.users as number[]))));
 				return groupProfile[0];
 			}
 			return null;
@@ -59,9 +57,7 @@ export class MessendoService {
 			const groupOwnerIds = room.groups;
 			const groupProfile = await this.custGroupRepository.getGroupProfile(groupOwnerIds);
 			if (groupProfile && groupProfile.length) {
-				await Promise.all(
-					groupProfile?.map(async grp => grp.users = await this.custUserRepository.getUsers(grp.users as number[] ))
-				)
+				await Promise.all(groupProfile?.map(async (grp) => (grp.users = await this.custUserRepository.getUsers(grp.users as number[]))));
 			}
 			const roomProfile = {
 				...room,
@@ -90,12 +86,22 @@ export class MessendoService {
 				groupId: msgData.sendToGroup,
 				userId: msgData.senderId,
 				message: msgData.message,
-			}
+			};
 
 			await this.custContentRepository.InsertToGroupContent(msgToContent);
 			return true;
 		} catch (error) {
 			console.error('MessendoService.insertToGroupContent Error: ', error);
+			return false;
+		}
+	}
+	async createNewRoom(userId: number, groupUserName: string): Promise<boolean> {
+		try {
+			const ids = await this.custGroupRepository.getGroupWithOwnerId([userId]);
+			await this.custRoomRepository.InsertNewProfile(userId, groupUserName, ids || []);
+			return true;
+		} catch (error) {
+			console.error('MessendoService.createNewRoom Error: ', error);
 			return false;
 		}
 	}
