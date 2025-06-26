@@ -3,9 +3,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { MessendoModule } from '../messendo/messendo.module';
 
 @Module({
-	imports: [
-		forwardRef(() => MessendoModule)
-	],
+	imports: [forwardRef(() => MessendoModule)],
 	providers: [WebSocketGateWay],
 	// exports: [WebSocketGateWay],
 })

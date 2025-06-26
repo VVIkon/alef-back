@@ -2,12 +2,11 @@
 	"parser": "@typescript-eslint/parser",
 	"extends": [
 		"airbnb-base",
-		"airbnb-typescript/base"
+		"airbnb-typescript/base",
+		"plugin:@typescript-eslint/recommended",
+  		"prettier"
 	],
-	"plugins": [
-		"@typescript-eslint",
-		"jest"
-	],
+	"plugins": ["@typescript-eslint", "jest"],
 	"env": {
 		"node": true,
 		"jest/globals": true
@@ -44,7 +43,6 @@
 				"message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
 			}
 		],
-		"function-paren-newline": ["error", "multiline-arguments"],
 		"import/prefer-default-export": "off",
 		"import/no-cycle": "off",
 		"no-empty-function": "off",
@@ -54,6 +52,10 @@
 		"@typescript-eslint/type-annotation-spacing": "error",
 		"no-shadow": "off",
 		"@typescript-eslint/no-unsafe-return": "off",
-		"@typescript-eslint/no-unsafe-assignment": "off"
+		"@typescript-eslint/no-unsafe-assignment": "off",
+		// "max-len": 200,
+		"function-paren-newline": ["error", "multiline-arguments"]
+		// "function-paren-newline": "off",
+    	// "object-curly-newline": "off"
 	}
 }

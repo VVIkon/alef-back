@@ -10,9 +10,7 @@ export class RoomRepository extends Repository<Room> {
 
 	public async getRoomProfile(roomOwnerId: number): Promise<Room | null> {
 		const room = await this.createQueryBuilder('rooms')
-			.where('rooms.userId = :roomOwnerId and rooms.active = 1', {
-				roomOwnerId,
-			})
+			.where('rooms.userId = :roomOwnerId and rooms.active = 1', { roomOwnerId })
 			.getOneOrFail();
 		return room || null;
 	}

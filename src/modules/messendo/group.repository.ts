@@ -12,7 +12,10 @@ export class GroupRepository extends Repository<Group> {
 	async getGroupProfile(groupOwnerIds: number[] | null): Promise<IGroupProfile[] | null> {
 		if (!groupOwnerIds?.length) return null;
 
-		const groupProfile = await this.createQueryBuilder('groups').where('groups.id IN (:...groupOwnerIds)', { groupOwnerIds }).andWhere('groups.active = 1').getMany();
+		const groupProfile = await this.createQueryBuilder('groups')
+			.where('groups.id IN (:...groupOwnerIds)', { groupOwnerIds })
+			.andWhere('groups.active = 1')
+			.getMany();
 		return [...groupProfile];
 	}
 	/**
@@ -20,7 +23,6 @@ export class GroupRepository extends Repository<Group> {
 	 */
 	async getGroupWithOwnerId(userGroupIds: number[] | null): Promise<number[] | null> {
 		if (!userGroupIds?.length) return null;
-
 		const { ids } = await this.createQueryBuilder('gr')
 			.select('json_agg(gr.id) as ids')
 			.where('gr.users @> ARRAY[:...userGroupIds]::int[]', { userGroupIds })

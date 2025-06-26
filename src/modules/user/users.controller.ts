@@ -46,10 +46,7 @@ export class UserController {
 	}
 
 	@Post('mail')
-	public async getUserByEmail(
-		@Res() res: Response,
-		@Body() mail: { email: string },
-	) {
+	public async getUserByEmail(@Res() res: Response, @Body() mail: { email: string }) {
 		const user = await this.usersService.getUserByEmail(mail.email);
 		if (!user) {
 			throw new Error('Нет такого пользователя!');
@@ -65,19 +62,11 @@ export class UserController {
 			token: string;
 		},
 	) {
-		const result = await this.usersService.getUserByToken(
-			param.id,
-			param.token,
-		);
-		return res
-			.status(result ? HttpStatus.OK : HttpStatus.NOT_FOUND)
-			.json({ result });
+		const result = await this.usersService.getUserByToken(param.id, param.token);
+		return res.status(result ? HttpStatus.OK : HttpStatus.NOT_FOUND).json({ result });
 	}
 	@Post()
-	public async createUser(
-		@Res() res: Response,
-		@Body() createUsersDTO: CreateUsersDTO,
-	) {
+	public async createUser(@Res() res: Response, @Body() createUsersDTO: CreateUsersDTO) {
 		const user = await this.usersService.create(createUsersDTO);
 		if (!user) {
 			throw new Error('Что-то сломалось!');
@@ -85,10 +74,7 @@ export class UserController {
 		return res.status(HttpStatus.OK).json(user);
 	}
 	@Post('update')
-	public async updateUser(
-		@Res() res: Response,
-		@Body() createUsersDTO: CreateUsersDTO,
-	) {
+	public async updateUser(@Res() res: Response, @Body() createUsersDTO: CreateUsersDTO) {
 		const user = await this.usersService.updateUserByid(createUsersDTO);
 		if (!user) {
 			throw new Error('Что-то сломалось!');

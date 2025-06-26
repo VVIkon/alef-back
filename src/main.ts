@@ -11,27 +11,14 @@ import { WsAdapter } from '@nestjs/platform-ws';
 
 export async function bootstrap(): Promise<NestExpressApplication> {
 	initializeTransactionalContext();
-	const app = await NestFactory.create<NestExpressApplication>(
-		AppModule,
-		new ExpressAdapter(),
-		{ cors: true },
-	);
+	const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), { cors: true });
 	const configService = app.get(ConfigService);
 	const reflector = app.get(Reflector); //  прикрепляет пользовательские метаданные к обработчикам маршрутов через декораторы
-	app.useGlobalFilters(
-		new AllExceptionsFilter(),
-		new QueryFailedFilter(reflector),
-	);
+	app.useGlobalFilters(new AllExceptionsFilter(), new QueryFailedFilter(reflector));
 	app.useWebSocketAdapter(new WsAdapter(app));
 
 	// Настройка Swagger
-	const configSwager = new DocumentBuilder()
-		.setTitle('VI Nest')
-		.setDescription('Документация API')
-		.setVersion('1.0')
-		.addTag('persons')
-		.addBearerAuth()
-		.build();
+	const configSwager = new DocumentBuilder().setTitle('VI Nest').setDescription('Документация API').setVersion('1.0').addTag('persons').addBearerAuth().build();
 
 	const document = SwaggerModule.createDocument(app, configSwager);
 	SwaggerModule.setup('api/docs', app, document); // Доступ по /api/docs

@@ -1,11 +1,6 @@
 import { STATUS_CODES } from 'node:http';
 import type { Request, Response } from 'express';
-import {
-	HttpException,
-	ExceptionFilter,
-	Catch,
-	ArgumentsHost,
-} from '@nestjs/common';
+import { HttpException, ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

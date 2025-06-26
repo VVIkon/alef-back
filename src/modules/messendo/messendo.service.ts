@@ -38,7 +38,11 @@ export class MessendoService {
 		try {
 			const groupProfile = await this.custGroupRepository.getGroupProfile([groupId]);
 			if (groupProfile && groupProfile.length) {
-				await Promise.all(groupProfile?.map(async (grp) => (grp.users = await this.custUserRepository.getUsers(grp.users as number[]))));
+				await Promise.all(
+					groupProfile?.map(
+						async (grp) => (grp.users = await this.custUserRepository.getUsers(grp.users as number[])),
+					),
+				);
 				return groupProfile[0];
 			}
 			return null;
@@ -57,7 +61,11 @@ export class MessendoService {
 			const groupOwnerIds = room.groups;
 			const groupProfile = await this.custGroupRepository.getGroupProfile(groupOwnerIds);
 			if (groupProfile && groupProfile.length) {
-				await Promise.all(groupProfile?.map(async (grp) => (grp.users = await this.custUserRepository.getUsers(grp.users as number[]))));
+				await Promise.all(
+					groupProfile?.map(
+						async (grp) => (grp.users = await this.custUserRepository.getUsers(grp.users as number[])),
+					),
+				);
 			}
 			const roomProfile = {
 				...room,

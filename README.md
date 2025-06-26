@@ -1,19 +1,20 @@
 # alef-back
-Первая основа
 
+Первая основа
 
 1. WebSocket (модуль WS)
 2. Заложен бек мессенджера (модуль MesSendo)
+
 ### migrations
-Ручная: `npm run migration:create -- ./src/common/db/migrations/createRoom`
-Модификация: `npm run migration:generate -- ./src/common/db/migrations/modyRoom`
-Выполнение:  `npm run migration:run`
+
+Ручная: `npm run migration:create -- ./src/common/db/migrations/createRoom` Модификация: `npm run migration:generate -- ./src/common/db/migrations/modyRoom` Выполнение: `npm run migration:run`
 
 ## Подробности
 
 ### 1.Таблицы и entities
 
 #### rooms
+
     `Предназначена для хранения участников общения.`
     `Аутентифицированный участник через userId получает структуру групп-пользователей для общения`
 
@@ -27,6 +28,7 @@
     - dateCreate: Date; (дата создания)
 
 #### groups
+
     `Группы общения. в группе всегда присутствует не менее 2 участников. Всегда хотя бы один не забанен.`
     `Сообщения всегда привязаны к группе`
 
@@ -41,6 +43,7 @@
     - dateCreate: Date; (дата создания)
 
 #### users
+
     `участники группы.`
     `роли:
         "admin" - администратор (главный и резервный)
@@ -60,6 +63,7 @@
     - active: number; (актовность: 1 - активна, 0 - удалена )
 
 #### contents
+
     `контент общения. Привязан к группе`
 
     - "id" SERIAL NOT NULL, (id контента)

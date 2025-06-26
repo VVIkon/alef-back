@@ -1,4 +1,12 @@
-import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, MessageBody, ConnectedSocket } from '@nestjs/websockets';
+import {
+	WebSocketGateway,
+	WebSocketServer,
+	OnGatewayConnection,
+	OnGatewayDisconnect,
+	SubscribeMessage,
+	MessageBody,
+	ConnectedSocket,
+} from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Server, WebSocket } from 'ws';
 import { AuthenticatedWebSocket } from './interfaces/authenticated-websocket.interface';
@@ -56,9 +64,10 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('sendMessage')
 	async handleMessage(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
-		const senderId = data?.senderId || 0;
+		// const senderId = data?.senderId || 0;
 		await this.messendoService.insertToGroupContent(data);
-		this.sendToUser(senderId, 'newMessage', data);
+		// this.sendToUser(senderId, 'newMessage', data);
+		this.broadcast('newMessage', data);
 	}
 
 	@UseGuards(WsJwtGuard)

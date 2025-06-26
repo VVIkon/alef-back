@@ -12,23 +12,16 @@ import { constraintErrors } from './constraint-errors';
 export class QueryFailedFilter implements ExceptionFilter<QueryFailedError> {
 	constructor(public reflector: Reflector) {}
 
-	catch(
-		exception: QueryFailedError & { constraint?: string },
-		host: ArgumentsHost,
-	) {
+	catch(exception: QueryFailedError & { constraint?: string }, host: ArgumentsHost) {
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse<Response>();
 
-		const status = exception.constraint?.startsWith('UQ')
-			? HttpStatus.CONFLICT
-			: HttpStatus.INTERNAL_SERVER_ERROR;
+		const status = exception.constraint?.startsWith('UQ') ? HttpStatus.CONFLICT : HttpStatus.INTERNAL_SERVER_ERROR;
 
 		response.status(status).json({
 			statusCode: status,
 			error: STATUS_CODES[status],
-			message: exception.constraint
-				? constraintErrors[exception.constraint]
-				: undefined,
+			message: exception.constraint ? constraintErrors[exception.constraint] : undefined,
 		});
 	}
 }

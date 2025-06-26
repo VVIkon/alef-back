@@ -9,9 +9,7 @@ export class UtilsService {
 	 * @example "hello_world" → "helloWorld"
 	 */
 	public static toCamelCase(str: string): string {
-		return str.replace(/([-_][a-z])/g, (group) =>
-			group.toUpperCase().replace('-', '').replace('_', ''),
-		);
+		return str.replace(/([-_][a-z])/g, (group) => group.toUpperCase().replace('-', '').replace('_', ''));
 	}
 
 	/**
@@ -51,9 +49,7 @@ export class UtilsService {
 	 * Удаляет undefined/null полей из объекта
 	 */
 	public static removeEmptyFields<T extends object>(obj: T): Partial<T> {
-		return Object.fromEntries(
-			Object.entries(obj).filter(([_, v]) => v != null),
-		) as Partial<T>;
+		return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null)) as Partial<T>;
 	}
 
 	// --- Array Utilities ---
@@ -62,9 +58,7 @@ export class UtilsService {
 	 * @example chunk([1,2,3,4], 2) → [[1,2], [3,4]]
 	 */
 	public static chunk<T>(array: T[], size: number): T[][] {
-		return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-			array.slice(i * size, i * size + size),
-		);
+		return Array.from({ length: Math.ceil(array.length / size) }, (_, i) => array.slice(i * size, i * size + size));
 	}
 
 	// --- Async Utilities ---
@@ -101,12 +95,7 @@ export class UtilsService {
 		if (password.length < 7) {
 			return false;
 		}
-		const symbols = [
-			'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-			'abcdefghijklmnopqrstuvwxyz',
-			'0123456789',
-			'!"№~$#%:&*()_-+=\/!\'',
-		];
+		const symbols = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz', '0123456789', '!"№~$#%:&*()_-+=\/!\''];
 		const matches = [0, 0, 0, 0];
 		for (const char of password.split('')) {
 			for (let n = 0; n < 4; n++) {

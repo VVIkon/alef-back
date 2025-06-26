@@ -42,8 +42,7 @@ export class AuthService {
 				fio: user.fio,
 			};
 			const access_token = this.jwtService.sign(payload);
-			const expires =
-				this.configService.get<number>('JWT_EXPIRATION_TIME') || 1;
+			const expires = this.configService.get<number>('JWT_EXPIRATION_TIME') || 1;
 			return { access_token, expires };
 		} catch (error) {
 			console.log(error.message);

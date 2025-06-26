@@ -45,8 +45,6 @@ export class UserTable1746187315289 implements MigrationInterface {
 		await queryRunner.query(`INSERT INTO "users" ("login", "password", "fio", "email", "token", "salt", "token_expare", "roles", "active") VALUES ('guest', 'guest', 'Guest', 'guest@mail.com', '23wd4tg23qw42dd34', '2323232', '128', '{"guest"}', 1)`);
 	}
 
-
-
 	public async down(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "fio"`);
 		await queryRunner.query(`ALTER TABLE "users" ADD "fio" character(128)`);
