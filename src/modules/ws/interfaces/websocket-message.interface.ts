@@ -15,6 +15,7 @@ export interface IGroupProfile {
 	active: number;
 	readOnly: number;
 	dateCreate: Date;
+	hasMessage: boolean;
 }
 
 export interface IRoomProfile {

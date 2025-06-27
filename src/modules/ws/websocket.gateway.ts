@@ -78,6 +78,7 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 				userId: client?.user?.sub || '',
 				username: client?.user?.fio || '',
 				message: '',
+				hasMessage: false,
 			});
 		}
 		const roomOwnerId = Number(client?.user?.sub) || 0;
@@ -87,6 +88,7 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 			userId: client?.user?.sub || '',
 			username: client?.user?.fio || '',
 			message: roomProfile || '',
+			hasMessage: false,
 		});
 	}
 	@UseGuards(WsJwtGuard)

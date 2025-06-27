@@ -16,7 +16,13 @@ export class GroupRepository extends Repository<Group> {
 			.where('groups.id IN (:...groupOwnerIds)', { groupOwnerIds })
 			.andWhere('groups.active = 1')
 			.getMany();
-		return [...groupProfile];
+		if (!groupProfile?.length) {
+			return null;
+		}
+		for (const el of groupProfile) {
+			el['hasMessage'] = false;
+		}
+		return groupProfile as IGroupProfile[];
 	}
 	/**
 	 * Добыть все группы в которых участвует
