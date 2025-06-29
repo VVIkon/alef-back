@@ -13,6 +13,7 @@ import { AuthenticatedWebSocket } from './interfaces/authenticated-websocket.int
 import { WebSocketMessage } from './interfaces/websocket-message.interface';
 import { WsJwtGuard } from '../auth/ws-jwt.guard';
 import { MessendoService } from '../messendo/messendo.service';
+import { log } from 'node:console';
 
 @WebSocketGateway(8080, {
 	path: '/ws',
@@ -65,8 +66,8 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 	@SubscribeMessage('sendMessage')
 	async handleMessage(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
 		// const senderId = data?.senderId || 0;
-		await this.messendoService.insertToGroupContent(data);
-		// this.sendToUser(senderId, 'newMessage', data);
+		const insertedContent = await this.messendoService.insertToGroupContent(data);
+		data.dateCreate = insertedContent?.dateCreate || null;
 		this.broadcast('newMessage', data);
 	}
 
@@ -104,6 +105,7 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 		const groupId = data?.groupId || 0;
 		data.message = await this.messendoService.getGroupContent(groupId);
 		const authUserId = data.authUserId;
+		// console.log(`>>> getGroupContent data: `, data)
 		this.sendToUser(authUserId, 'groupContent', data);
 	}
 	@UseGuards(WsJwtGuard)

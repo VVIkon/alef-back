@@ -29,7 +29,9 @@ export class Content {
 	active: number;
 
 	@Column({
-		default: 'now',
+		type: 'timestamp',
+		default: () => 'CURRENT_TIMESTAMP'
 	})
 	dateCreate: Date;
+
 }

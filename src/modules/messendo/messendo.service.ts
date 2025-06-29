@@ -87,8 +87,8 @@ export class MessendoService {
 			return null;
 		}
 	}
-	async insertToGroupContent(msgData): Promise<boolean> {
-		if (!msgData) return false;
+	async insertToGroupContent(msgData): Promise<Content | null> {
+		if (!msgData) return null;
 		try {
 			const msgToContent = {
 				groupId: msgData.sendToGroup,
@@ -96,11 +96,10 @@ export class MessendoService {
 				message: msgData.message,
 			};
 
-			await this.custContentRepository.InsertToGroupContent(msgToContent);
-			return true;
+			return await this.custContentRepository.InsertToGroupContent(msgToContent);
 		} catch (error) {
 			console.error('MessendoService.insertToGroupContent Error: ', error);
-			return false;
+			return null;
 		}
 	}
 	async createNewRoom(userId: number, groupUserName: string): Promise<boolean> {

@@ -35,9 +35,10 @@ export class ContentRepository extends Repository<Content> {
 		return groupProfile || null;
 	}
 
-	async InsertToGroupContent(msgToContent): Promise<void> {
-		if (!msgToContent) return;
-		await this.createQueryBuilder()
+	async InsertToGroupContent(msgToContent): Promise<Content | null> {
+		if (!msgToContent)
+			return null;
+		const groupContent = await this.createQueryBuilder()
 			.insert()
 			.into(Content)
 			.values({
@@ -45,7 +46,11 @@ export class ContentRepository extends Repository<Content> {
 				userId: msgToContent.userId,
 				message: msgToContent.message,
 				active: 1,
+				dateCreate: () => "NOW()",
 			})
+			.returning('*')
+			// .returning(['id', 'groupId', 'userId', 'message', 'active', 'dateCreate'])
 			.execute();
+		return groupContent.raw[0];
 	}
 }
