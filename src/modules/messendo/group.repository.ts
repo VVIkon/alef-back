@@ -1,7 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { Group } from '../../common/db/entities/group.entity';
-import type { IGroupProfile } from '../ws/interfaces/websocket-message.interface';
+import type { IGroupProfile, INewGroup } from '../ws/interfaces/websocket-message.interface';
 
 @Injectable()
 export class GroupRepository extends Repository<Group> {
@@ -9,15 +9,15 @@ export class GroupRepository extends Repository<Group> {
 		super(Group, dataSource.createEntityManager());
 	}
 
-	async getGroupProfile(groupOwnerIds: number[] | null): Promise<IGroupProfile[] | null> {
-		if (!groupOwnerIds?.length) return null;
+	async getGroupProfile(groupOwnerIds: number[] | null): Promise<IGroupProfile[]> {
+		if (!groupOwnerIds?.length) return [];
 
 		const groupProfile = await this.createQueryBuilder('groups')
 			.where('groups.id IN (:...groupOwnerIds)', { groupOwnerIds })
 			.andWhere('groups.active = 1')
 			.getMany();
 		if (!groupProfile?.length) {
-			return null;
+			return [];
 		}
 		for (const el of groupProfile) {
 			el['hasMessage'] = false;
@@ -35,6 +35,29 @@ export class GroupRepository extends Repository<Group> {
 			.getRawOne();
 		return ids;
 	}
-
-	// SELECT json_agg(id) FROM public."groups" where users @> ARRAY[12]::int[]
+	/**
+	 * Создает новую группу
+	 * @param groupParams
+	 * @returns
+	 */
+	async insertNewGroup(groupParams: INewGroup): Promise<IGroupProfile | null> {
+		if (!groupParams)
+			return null;
+		const newGroup = await this.createQueryBuilder()
+			.insert()
+			.into(Group)
+			.values({
+				nameGroup: groupParams.nameGroup,
+				typeGroup: groupParams.typeGroup,
+				userId: groupParams.userId,
+				users: groupParams.users,
+				moderators: groupParams.moderators,
+				active: groupParams.active,
+				readOnly: groupParams.readOnly,
+				dateCreate: () => "NOW()",
+			})
+			.returning('*')
+			.execute();
+		return newGroup.raw[0] || null;
+	}
 }

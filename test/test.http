@@ -47,18 +47,23 @@ POST http://localhost:3101/users
 content-type: application/json
 
 {
-	"login": "inactive",
-	"password": "inactive",
-	"fio": "Guest-inactive",
-	"email":"guest-inactive@mail.ru",
-	"token": "qqweqweqwe",
-	"salt": 80767853454,
+	"fio": "Денис Завалишин",
+	"login": "denis",
+	"password": "denis",
+	"email":"denis@mail.ru",
+	"token": "qqw12qdfgwerttyyweeqwe45qwe",
+	"salt": 80767834453334,
 	"token_expare": 12,
 	"roles": [
-		"guest"
+		"user"
 		],
-	"active": 0
+	"active": 1
 }
+###
+
+GET https://api.randomdatatools.ru/?typeName=true&typeName=all&params=FirstName,LastName,FatherName,Email
+# GET https://api.randomdatatools.ru/?typeName=true&typeName=all
+content-type: application/json
 ###
 
 DELETE http://localhost:3000/users/88

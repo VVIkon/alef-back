@@ -10,7 +10,7 @@ import {
 import { Logger, UseGuards } from '@nestjs/common';
 import { Server, WebSocket } from 'ws';
 import { AuthenticatedWebSocket } from './interfaces/authenticated-websocket.interface';
-import { WebSocketMessage } from './interfaces/websocket-message.interface';
+import { WebSocketMessage, INewGroup } from './interfaces/websocket-message.interface';
 import { WsJwtGuard } from '../auth/ws-jwt.guard';
 import { MessendoService } from '../messendo/messendo.service';
 import { log } from 'node:console';
@@ -83,7 +83,8 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 			});
 		}
 		const roomOwnerId = Number(client?.user?.sub) || 0;
-		const roomProfile = await this.messendoService.getRoom(roomOwnerId);
+		const roomOwnerName = client?.user?.fio || '';
+		const roomProfile = await this.messendoService.getRoom(roomOwnerId, roomOwnerName);
 
 		this.broadcast('roomProfile', {
 			userId: client?.user?.sub || '',
@@ -92,6 +93,23 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 			hasMessage: false,
 		});
 	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('createNewRoom')
+	async createNewRoom(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
+		const userId = Number(client?.user?.sub || '0');
+		const username = client?.user?.fio || '';
+		if (!data || data.message !== 'createNewRoom') {
+			return this.broadcast('newRoom', {
+				userId,
+				username,
+				message: '',
+			});
+		}
+		data.message = await this.messendoService.createNewRoom(Number(userId), username);
+		this.sendToUser(userId, 'newRoom', data);
+	}
+
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('getGroupContent')
 	async getGroupContent(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
@@ -108,21 +126,30 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 		// console.log(`>>> getGroupContent data: `, data)
 		this.sendToUser(authUserId, 'groupContent', data);
 	}
+
 	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('createNewRoom')
-	async createNewRoom(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
-		const userId = client?.user?.sub || '0';
-		const username = client?.user?.fio || '';
-		if (!data || data.message !== 'createNewRoom') {
-			return this.broadcast('newRoom', {
+	@SubscribeMessage('createNewGroup')
+	async createNewGroup(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
+		try {
+			const userId = Number(client?.user?.sub || '0');
+			const username = client?.user?.fio || '';
+			const newGroup: INewGroup = {
+				roomId: data?.message?.roomId || 0,
+				nameGroup: `${username} Group`,
+				typeGroup:	data?.message?.typeGroup || 'private',
 				userId,
-				username,
-				message: '',
-			});
+				users: data?.message?.users,
+				moderators: [userId],
+				active: data?.message?.active,
+				readOnly: data?.message?.readOnly,
+			}
+			data.message = await this.messendoService.createNewGroup(newGroup);
+			this.sendToUser(userId, 'newGroup', data);
+		} catch (err) {
+			console.log('createNewGroup Error: ', err)
 		}
-		data.message = await this.messendoService.createNewRoom(Number(userId), username);
-		this.sendToUser(userId, 'newRoom', data);
 	}
+
 
 	//------------------- senders -------------------------------------
 
@@ -135,8 +162,8 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 		});
 	}
 
-	private sendToUser(userderId: string, event: string, data: any): boolean {
-		const client = this.clients.get(userderId);
+	private sendToUser(userderId: number, event: string, data: any): boolean {
+		const client = this.clients.get(userderId.toString());
 		if (client) {
 			const message: WebSocketMessage = { event, data };
 			client.send(JSON.stringify(message));

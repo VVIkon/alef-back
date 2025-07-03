@@ -5,17 +5,33 @@ export interface WebSocketMessage<T = any> {
 	data: T;
 }
 
-export interface IGroupProfile {
+export interface IUserProfile {
 	id: number;
+	fio: string;
+}
+
+export interface INewGroup {
+	roomId: number,
+	nameGroup: string;
+	typeGroup: 'public' | 'private' | 'hidden';
+	userId: number;
+	users: number[];
+	moderators: number[],
+	active: number,
+	readOnly: number;
+}
+
+export interface IGroupProfile {
+	id?: number;
 	nameGroup: string;
 	typeGroup: string;
 	userId: number;
-	users: number[] | CreateUsersDTO[] | null;
+	users: number[] | IUserProfile[] | null;
 	moderators: number[] | null;
 	active: number;
 	readOnly: number;
-	dateCreate: Date;
-	hasMessage: boolean;
+	dateCreate?: Date;
+	hasMessage?: boolean;
 }
 
 export interface IRoomProfile {
@@ -23,7 +39,7 @@ export interface IRoomProfile {
 	name: string;
 	userId: number;
 	groups: IGroupProfile[] | null;
-	users: number[] | null;
+	users: number[] | IUserProfile[] | null;
 	channels: number[] | null;
 	active: number;
 	dateCreate: Date;
