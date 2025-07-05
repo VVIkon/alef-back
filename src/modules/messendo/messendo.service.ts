@@ -143,6 +143,12 @@ export class MessendoService {
 			return null;
 		}
 	}
+	/**
+	 * Создаёт новую группу, проверяет реально существующие группы (не удалённые) и
+	 * чинит ссылки на них в rooms
+	 * @param newGroup
+	 * @returns
+	 */
 	async createNewGroup(newGroup: INewGroup): Promise<IGroupProfile | null> {
 		if (!newGroup) return null;
 		try {
@@ -150,7 +156,8 @@ export class MessendoService {
 			if (groupProfile?.id) {
 				const room = await this.custRoomRepository.getRoomProfileById(newGroup.roomId);
 				if (room?.groups) {
-					const groupsRoom: number[] = [...room?.groups, ...[groupProfile.id]];
+					const realyGroups = await this.custGroupRepository.getGroupProfile(room?.groups);
+					const groupsRoom: number[] = [...(realyGroups.map(el => el.id)) as number[], ...[groupProfile.id]];
 					await this.custRoomRepository.updateRoomGroup(newGroup.roomId, groupsRoom);
 				}
 			}
