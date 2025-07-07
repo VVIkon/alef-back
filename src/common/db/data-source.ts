@@ -1,8 +1,9 @@
 import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
-export const getDataSource = (configService: ConfigService) => {
-	return new DataSource({
+// export const getDataSource = (configService: ConfigService) => {
+export async function getDataSource(configService: ConfigService) {
+	const dataSource = new DataSource({
 		type: 'postgres',
 		host: configService.get<string>('DB_HOST', '192.168.1.104'),
 		port: configService.get<number>('DB_PORT', 5432),
@@ -13,4 +14,6 @@ export const getDataSource = (configService: ConfigService) => {
 		synchronize: false,
 		logging: true, // Логирование запросов
 	});
+	await dataSource.initialize(); // инициализация
+	return dataSource;
 };

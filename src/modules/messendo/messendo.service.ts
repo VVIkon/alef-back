@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository,  } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../common/db/entities/users.entity';
 import { Room } from '../../common/db/entities/room.entity';
@@ -152,17 +152,24 @@ export class MessendoService {
 	async createNewGroup(newGroup: INewGroup): Promise<IGroupProfile | null> {
 		if (!newGroup) return null;
 		try {
-			const groupProfile = await this.custGroupRepository.insertNewGroup(newGroup) || null;
-			if (groupProfile?.id) {
-				const room = await this.custRoomRepository.getRoomProfileById(newGroup.roomId);
-				if (room?.groups) {
-					const realyGroups = await this.custGroupRepository.getGroupProfile(room?.groups);
-					const groupsRoom: number[] = [...(realyGroups.map(el => el.id)) as number[], ...[groupProfile.id]];
-					await this.custRoomRepository.updateRoomGroup(newGroup.roomId, groupsRoom);
-				}
+			const groupProfile = await this.custGroupRepository.insertNewGroup(newGroup);
+			if (!groupProfile?.id) throw new Error('Group creation failed');
+
+			const room = await this.custRoomRepository.getRoomProfileById(newGroup.roomId);
+
+			if (room?.groups) {
+				const realyGroups = await this.custGroupRepository.getGroupProfile(room?.groups);
+
+					const groupsRoom: number[] = [
+						...(realyGroups.map(el => el.id)) as number[],
+						groupProfile.id
+					];
+
+				await this.custRoomRepository.updateRoomGroup(newGroup.roomId, groupsRoom);
 			}
 			if (groupProfile?.users?.length) {
 				const usersInGroup = await this.custUserRepository.getUsers(groupProfile.users as number[]);
+
 				groupProfile.users = usersInGroup?.map((el) => {
 					return {
 						id: el.id,
@@ -173,8 +180,8 @@ export class MessendoService {
 			return groupProfile;
 
 		} catch (error) {
-			console.error('MessendoService.insertToGroupContent Error: ', error);
-			return null;
+			console.error('MessendoService.createNewGroup Error: ', error);
+			throw error; // откат транзакции
 		}
-	}
+	};
 }

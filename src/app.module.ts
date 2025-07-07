@@ -21,8 +21,8 @@ import { WebSocketModule } from './modules/ws/websocket.module';
 		TypeOrmModule.forRootAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
-			useFactory: (configService: ConfigService) => {
-				const dataSource = getDataSource(configService);
+			useFactory: async (configService: ConfigService) => {
+				const dataSource = await getDataSource(configService);
 				return dataSource.options;
 			},
 		}),

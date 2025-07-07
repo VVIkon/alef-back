@@ -17,7 +17,12 @@ import { AuthService } from '../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User, Room, Group, Content])],
+	imports: [TypeOrmModule.forFeature([
+		User,
+		Room,
+		Group,
+		Content
+	])],
 	providers: [
 		{
 			provide: RoomRepository,
