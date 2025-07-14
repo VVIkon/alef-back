@@ -1,12 +1,43 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Group } from '../../common/db/entities/group.entity';
 import type { IGroupProfile, INewGroup } from '../ws/interfaces/websocket-message.interface';
 
 @Injectable()
 export class GroupRepository extends Repository<Group> {
-	constructor(private dataSource: DataSource) {
-		super(Group, dataSource.createEntityManager());
+    constructor(dataSourceOrManager: DataSource | EntityManager) {
+        super(
+            Group,
+            dataSourceOrManager instanceof DataSource
+                ? dataSourceOrManager.createEntityManager()
+                : dataSourceOrManager
+        );
+    }
+	/**
+	 * Создает новую группу
+	 * @param groupParams
+	 * @returns
+	 */
+	async insertNewGroup(groupParams: INewGroup): Promise<IGroupProfile | null> {
+		if (!groupParams)
+			return null;
+		const newGroup = await this.createQueryBuilder()
+			.insert()
+			.into(Group)
+			.values({
+				nameGroup: groupParams.nameGroup,
+				typeGroup: groupParams.typeGroup,
+				userId: groupParams.userId,
+				users: groupParams.users,
+				moderators: groupParams.moderators,
+				active: groupParams.active,
+				readOnly: groupParams.readOnly,
+				dateCreate: () => "NOW()",
+			})
+			.returning('*')
+			.execute();
+		return newGroup.raw[0] || null;
 	}
 
 	async getGroupProfile(groupOwnerIds: number[] | null): Promise<IGroupProfile[]> {
@@ -34,30 +65,5 @@ export class GroupRepository extends Repository<Group> {
 			.where('gr.users @> ARRAY[:...userGroupIds]::int[]', { userGroupIds })
 			.getRawOne();
 		return ids;
-	}
-	/**
-	 * Создает новую группу
-	 * @param groupParams
-	 * @returns
-	 */
-	async insertNewGroup(groupParams: INewGroup): Promise<IGroupProfile | null> {
-		if (!groupParams)
-			return null;
-		const newGroup = await this.createQueryBuilder()
-			.insert()
-			.into(Group)
-			.values({
-				nameGroup: groupParams.nameGroup,
-				typeGroup: groupParams.typeGroup,
-				userId: groupParams.userId,
-				users: groupParams.users,
-				moderators: groupParams.moderators,
-				active: groupParams.active,
-				readOnly: groupParams.readOnly,
-				dateCreate: () => "NOW()",
-			})
-			.returning('*')
-			.execute();
-		return newGroup.raw[0] || null;
 	}
 }

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { InjectRepository,  } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { User } from '../../common/db/entities/users.entity';
 import { Room } from '../../common/db/entities/room.entity';
 import { Group } from '../../common/db/entities/group.entity';
@@ -9,27 +9,34 @@ import { RoomRepository } from './room.repository';
 import { GroupRepository } from './group.repository';
 import { UserRepository } from '../user/user.repository';
 import { ContentRepository } from './content.repository';
-import type { IRoomProfile, IGroupProfile, INewGroup, IUserProfile } from '../ws/interfaces/websocket-message.interface';
+import type {
+	IRoomProfile,
+	IGroupProfile,
+	INewGroup,
+	IUserProfile,
+} from '../ws/interfaces/websocket-message.interface';
 
 @Injectable()
 export class MessendoService {
 	constructor(
-		@InjectRepository(Room)
-		private roomRepository: Repository<Room>,
 
-		@InjectRepository(Group)
-		private groupRepository: Repository<Group>,
+		// @InjectRepository(Room)
+		// private roomRepository: Repository<Room>,
 
-		@InjectRepository(User)
-		private userRepository: Repository<User>,
+		// @InjectRepository(Group)
+		// private groupRepository: Repository<Group>,
 
-		@InjectRepository(Content)
-		private contentRepository: Repository<Content>,
+		// @InjectRepository(User)
+		// private userRepository: Repository<User>,
+
+		// @InjectRepository(Content)
+		// private contentRepository: Repository<Content>,
 
 		private readonly custRoomRepository: RoomRepository,
 		private readonly custGroupRepository: GroupRepository,
 		private readonly custUserRepository: UserRepository,
 		private readonly custContentRepository: ContentRepository,
+		private readonly dataSource: DataSource,
 	) {}
 
 	async getGroup(groupId: number): Promise<IGroupProfile | null> {
@@ -127,7 +134,7 @@ export class MessendoService {
 	async insertToGroupContent(msgData: {
 		sendToGroup: number;
 		senderId: number;
-		message: string
+		message: string;
 	}): Promise<Content | null> {
 		if (!msgData) return null;
 		try {
@@ -151,37 +158,53 @@ export class MessendoService {
 	 */
 	async createNewGroup(newGroup: INewGroup): Promise<IGroupProfile | null> {
 		if (!newGroup) return null;
+		const queryRunner = this.dataSource.createQueryRunner();
+		await queryRunner.connect();
+		// Начинаем
+		await queryRunner.startTransaction();
+
 		try {
-			const groupProfile = await this.custGroupRepository.insertNewGroup(newGroup);
+			let groupProfile: IGroupProfile | null = null;
+
+			// Создаем экземпляры кастомных репозиториев для текущего QueryRunner
+			const custGroupRepository = new GroupRepository(queryRunner.manager);
+			const custRoomRepository = new RoomRepository(queryRunner.manager);
+			const custUserRepository = new UserRepository(queryRunner.manager);
+
+			// Вставляем новую группу
+			groupProfile = await custGroupRepository.insertNewGroup(newGroup);
+
+			// проверяем записалось ли?
 			if (!groupProfile?.id) throw new Error('Group creation failed');
 
-			const room = await this.custRoomRepository.getRoomProfileById(newGroup.roomId);
-
+			// Проверка и обновление действующих групп у кабинета
+			const room = await custRoomRepository.getRoomProfileById(newGroup.roomId);
 			if (room?.groups) {
-				const realyGroups = await this.custGroupRepository.getGroupProfile(room?.groups);
-
-					const groupsRoom: number[] = [
-						...(realyGroups.map(el => el.id)) as number[],
-						groupProfile.id
-					];
-
-				await this.custRoomRepository.updateRoomGroup(newGroup.roomId, groupsRoom);
+				const realyGroups = await custGroupRepository.getGroupProfile(room.groups);
+				const groupsRoom: number[] = [
+					...(realyGroups.map((el) => el.id) as number[]),
+					groupProfile.id
+				];
+				await custRoomRepository.updateRoomGroup(newGroup.roomId, groupsRoom);
 			}
+			// Наводняем пользователями группу
 			if (groupProfile?.users?.length) {
-				const usersInGroup = await this.custUserRepository.getUsers(groupProfile.users as number[]);
-
-				groupProfile.users = usersInGroup?.map((el) => {
-					return {
+				const usersInGroup = await custUserRepository.getUsers(groupProfile.users as number[]);
+				groupProfile.users =
+					usersInGroup?.map((el) => ({
 						id: el.id,
 						fio: el.fio,
-					};
-				}) || [];
+					})) || [];
 			}
+			// завершаем
+			await queryRunner.commitTransaction();
 			return groupProfile;
-
 		} catch (error) {
-			console.error('MessendoService.createNewGroup Error: ', error);
-			throw error; // откат транзакции
+			await queryRunner.rollbackTransaction();
+			console.error('MessendoService.insertToGroupContent Error: ', error);
+			return null;
+		} finally {
+			await queryRunner.release();
 		}
-	};
+	}
 }

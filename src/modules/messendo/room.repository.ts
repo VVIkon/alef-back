@@ -1,12 +1,17 @@
-import { EntityRepository, DataSource, Repository } from 'typeorm';
+import { EntityManager, DataSource, Repository } from 'typeorm';
 import { Room } from '../../common/db/entities/room.entity';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class RoomRepository extends Repository<Room> {
-	constructor(private dataSource: DataSource) {
-		super(Room, dataSource.createEntityManager());
+	constructor(dataSourceOrManager: DataSource | EntityManager) {
+		super(
+			Room,
+			dataSourceOrManager instanceof DataSource ? dataSourceOrManager.createEntityManager() : dataSourceOrManager,
+		);
 	}
+
 	/**
 	 * Профиль кабинета по id владельца
 	 * @param roomOwnerId
@@ -24,9 +29,7 @@ export class RoomRepository extends Repository<Room> {
 	 * @returns
 	 */
 	public async getRoomProfileById(roomId: number): Promise<Room | null> {
-		const room = await this.createQueryBuilder('rooms')
-			.where('rooms.id = :id', { id: roomId })
-			.getOne();
+		const room = await this.createQueryBuilder('rooms').where('rooms.id = :id', { id: roomId }).getOne();
 		return room || null;
 	}
 
@@ -60,7 +63,7 @@ export class RoomRepository extends Repository<Room> {
 			.set({
 				groups: groupIds || [],
 			})
-			.where("id = :id", { id: roomId })
+			.where('id = :id', { id: roomId })
 			.returning('*')
 			.execute();
 		return room.raw[0];

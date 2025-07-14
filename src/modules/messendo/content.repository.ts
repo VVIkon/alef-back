@@ -1,5 +1,6 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, EntityManager } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Content } from '../../common/db/entities/content.entity';
 import { User } from '../../common/db/entities/users.entity';
 import { Group } from '../../common/db/entities/group.entity';
@@ -7,8 +8,11 @@ import { Group } from '../../common/db/entities/group.entity';
 
 @Injectable()
 export class ContentRepository extends Repository<Content> {
-	constructor(private dataSource: DataSource) {
-		super(Content, dataSource.createEntityManager());
+	constructor(dataSourceOrManager: DataSource | EntityManager) {
+		super(
+			Content,
+			dataSourceOrManager instanceof DataSource ? dataSourceOrManager.createEntityManager() : dataSourceOrManager,
+		);
 	}
 
 	async getGroupContent(contentsGroupId: number | null): Promise<Content[] | null> {
@@ -36,8 +40,7 @@ export class ContentRepository extends Repository<Content> {
 	}
 
 	async InsertToGroupContent(msgToContent): Promise<Content | null> {
-		if (!msgToContent)
-			return null;
+		if (!msgToContent) return null;
 		const groupContent = await this.createQueryBuilder()
 			.insert()
 			.into(Content)
@@ -46,7 +49,7 @@ export class ContentRepository extends Repository<Content> {
 				userId: msgToContent.userId,
 				message: msgToContent.message,
 				active: 1,
-				dateCreate: () => "NOW()",
+				dateCreate: () => 'NOW()',
 			})
 			.returning('*')
 			// .returning(['id', 'groupId', 'userId', 'message', 'active', 'dateCreate'])

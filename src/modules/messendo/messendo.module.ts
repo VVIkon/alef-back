@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from '../../common/db/entities/users.entity';
 import { Group } from '../../common/db/entities/group.entity';
@@ -17,12 +17,7 @@ import { AuthService } from '../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([
-		User,
-		Room,
-		Group,
-		Content
-	])],
+	imports: [TypeOrmModule.forFeature([User, Room, Group, Content])],
 	providers: [
 		{
 			provide: RoomRepository,
@@ -43,12 +38,19 @@ import { JwtService } from '@nestjs/jwt';
 			provide: ContentRepository,
 			useFactory: (dataSource: DataSource) => new ContentRepository(dataSource),
 			inject: [DataSource],
+
 		},
 		MessendoService,
 		UsersService,
 		JwtService,
 	],
 	controllers: [],
-	exports: [MessendoService, JwtService],
+	exports: [
+		MessendoService,
+		JwtService,
+	 	RoomRepository,
+		GroupRepository,
+		UserRepository,
+],
 })
 export class MessendoModule {}
