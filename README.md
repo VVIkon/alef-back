@@ -4,7 +4,7 @@
 
 1. WebSocket (модуль WS)
 2. Заложен бек мессенджера (модуль MesSendo)
-3. Добавлен BotUser - Ollama + chatOllama
+3. Добавлен BotUser - Ollama (llama3)
 
 ### migrations
 
