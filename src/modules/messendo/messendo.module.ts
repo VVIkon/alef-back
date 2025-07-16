@@ -15,6 +15,7 @@ import { ContentRepository } from './content.repository';
 import { WebSocketGateWay } from '../ws/websocket.gateway';
 import { AuthService } from '../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { OllamaService } from './ollama.service';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([User, Room, Group, Content])],
@@ -43,6 +44,7 @@ import { JwtService } from '@nestjs/jwt';
 		MessendoService,
 		UsersService,
 		JwtService,
+		OllamaService,
 	],
 	controllers: [],
 	exports: [

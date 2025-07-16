@@ -4,6 +4,7 @@
 
 1. WebSocket (модуль WS)
 2. Заложен бек мессенджера (модуль MesSendo)
+3. Добавлен BotUser - Ollama + chatOllama
 
 ### migrations
 
@@ -72,3 +73,4 @@
     - "message" text NOT NULL DEFAULT '', (сообщение)
     - "active" integer NOT NULL DEFAULT '1', (актовность: 1 - активна, 0 - удалена )
     - "dateCreate" TIMESTAMP NOT NULL DEFAULT 'now', (дата создания)
+

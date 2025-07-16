@@ -44,3 +44,13 @@ export interface IRoomProfile {
 	active: number;
 	dateCreate: Date;
 }
+
+export interface IMessage {
+	token?: string;
+	message: string | null;
+	sendToGroup: number;
+	groupName: string | null;
+	senderId: number;
+	senderName: string | null;
+	dateCreate?: Date | null;
+}

@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
-// export const getDataSource = (configService: ConfigService) => {
 export async function getDataSource(configService: ConfigService) {
 	const dataSource = new DataSource({
 		type: 'postgres',

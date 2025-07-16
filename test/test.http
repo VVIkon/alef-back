@@ -47,15 +47,15 @@ POST http://localhost:3101/users
 content-type: application/json
 
 {
-	"fio": "Денис Завалишин",
-	"login": "denis",
-	"password": "denis",
-	"email":"denis@mail.ru",
-	"token": "qqw12qdfgwerttyyweeqwe45qwe",
-	"salt": 80767834453334,
+	"fio": "Ollama Bot",
+	"login": "ollama",
+	"password": "ollama",
+	"email":"ollama@mail.ru",
+	"token": "qqw12yw45qwe",
+	"salt": 8053334,
 	"token_expare": 12,
 	"roles": [
-		"user"
+		"bot"
 		],
 	"active": 1
 }
@@ -86,6 +86,14 @@ content-type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJlbWFpbCI6ImdyYXNzQG1haWwuY29tIiwicm9sZXMiOlsiYWRtaW4iLCJvd25lciIsInN1cGVydXNlciJdLCJhY3RpdmUiOjEsImZpbyI6IkdyYXNzIEhvcHBlciIsImlhdCI6MTc0Nzc1MzA1OSwiZXhwIjoxNzQ3NzU2NjU5fQ._LSlfkJLQitRMiA5x8u8iaWBg5XgMAnILtK3DkH2Skk
 ###
 
-# -------------- Persons---------------
+# -------------- Ollama---------------
 
+POST http://localhost:11434/api/generate
+content-type: application/json
+
+{
+	"model": "llama3",
+	"prompt": "Привет!"
+}
+###
 

@@ -13,7 +13,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 	initializeTransactionalContext();
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), { cors: true });
 	const configService = app.get(ConfigService);
-	const reflector = app.get(Reflector); //  прикрепляет пользовательские метаданные к обработчикам маршрутов через декораторы
+	const reflector = app.get(Reflector); 
 	app.useGlobalFilters(new AllExceptionsFilter(), new QueryFailedFilter(reflector));
 	app.useWebSocketAdapter(new WsAdapter(app));
 

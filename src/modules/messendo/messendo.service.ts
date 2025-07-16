@@ -14,10 +14,13 @@ import type {
 	IGroupProfile,
 	INewGroup,
 	IUserProfile,
+	IMessage,
 } from '../ws/interfaces/websocket-message.interface';
+import { OllamaService } from './ollama.service';
 
 @Injectable()
 export class MessendoService {
+
 	constructor(
 
 		// @InjectRepository(Room)
@@ -37,6 +40,7 @@ export class MessendoService {
 		private readonly custUserRepository: UserRepository,
 		private readonly custContentRepository: ContentRepository,
 		private readonly dataSource: DataSource,
+		private readonly ollamaService: OllamaService,
 	) {}
 
 	async getGroup(groupId: number): Promise<IGroupProfile | null> {
@@ -131,11 +135,12 @@ export class MessendoService {
 			return null;
 		}
 	}
-	async insertToGroupContent(msgData: {
-		sendToGroup: number;
-		senderId: number;
-		message: string;
-	}): Promise<Content | null> {
+	async insertToGroupContent(msgData: IMessage): Promise<Content | null> {
+	// {
+	// 	sendToGroup: number;
+	// 	senderId: number;
+	// 	message: string;
+	// }
 		if (!msgData) return null;
 		try {
 			const msgToContent = {
@@ -206,5 +211,26 @@ export class MessendoService {
 		} finally {
 			await queryRunner.release();
 		}
+	}
+
+	async prepareMessageForBot(data: any): Promise<IMessage[] | null> {
+		const userBot = await this.custGroupRepository.getUsersInGroupWithRoles(data.sendToGroup);
+		if(userBot?.length) {
+			const botsMessages = await Promise.all(
+				userBot.map(async uEl => {
+					const message = await this.ollamaService.handleOllama(data)
+					return {
+						token: data.token,
+						message,
+						sendToGroup: data.sendToGroup,
+						groupName: data.groupName,
+						senderId: uEl.id,
+						senderName: uEl.fio
+					}
+				})
+			)
+			return botsMessages || null;
+		}
+		return null;
 	}
 }

@@ -8,12 +8,13 @@ import {
 	ConnectedSocket,
 } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
+// import { ConfigService } from '@nestjs/config';
 import { Server, WebSocket } from 'ws';
 import { AuthenticatedWebSocket } from './interfaces/authenticated-websocket.interface';
 import { WebSocketMessage, INewGroup } from './interfaces/websocket-message.interface';
 import { WsJwtGuard } from '../auth/ws-jwt.guard';
 import { MessendoService } from '../messendo/messendo.service';
-import { log } from 'node:console';
+
 
 @WebSocketGateway(8080, {
 	path: '/ws',
@@ -36,7 +37,7 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 
 	handleConnection(client: AuthenticatedWebSocket) {
 		this.logger.log(`handleConnection. Client connected: ${client}`);
-		// console.trace(); // Это поможет понять, откуда приходит соединение
+		// console.trace(); // откуда приходит соединение
 	}
 	handleDisconnect(client: AuthenticatedWebSocket) {
 		if (client.user) {
@@ -66,9 +67,19 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 	@SubscribeMessage('sendMessage')
 	async handleMessage(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
 		// const senderId = data?.senderId || 0;
+		console.log(`>>> client.user: `, client?.user || '!!')
+		console.log(`>>> data: `, data)
 		const insertedContent = await this.messendoService.insertToGroupContent(data);
 		data.dateCreate = insertedContent?.dateCreate || null;
 		this.broadcast('newMessage', data);
+		const botData = await this.messendoService.prepareMessageForBot(data);
+		if(botData){
+			for await (const data of botData) {
+				const insertedContent = await this.messendoService.insertToGroupContent(data);
+				data.dateCreate = insertedContent?.dateCreate || null;
+				this.broadcast('newMessage', data);
+			}
+		}
 	}
 
 	@UseGuards(WsJwtGuard)
