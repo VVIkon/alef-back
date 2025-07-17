@@ -7,22 +7,19 @@ import type { IGroupProfile, INewGroup, IUserProfile } from '../ws/interfaces/we
 
 @Injectable()
 export class GroupRepository extends Repository<Group> {
-    constructor(dataSourceOrManager: DataSource | EntityManager) {
-        super(
-            Group,
-            dataSourceOrManager instanceof DataSource
-                ? dataSourceOrManager.createEntityManager()
-                : dataSourceOrManager
-        );
-    }
+	constructor(dataSourceOrManager: DataSource | EntityManager) {
+		super(
+			Group,
+			dataSourceOrManager instanceof DataSource ? dataSourceOrManager.createEntityManager() : dataSourceOrManager,
+		);
+	}
 	/**
 	 * Создает новую группу
 	 * @param groupParams
 	 * @returns
 	 */
 	async insertNewGroup(groupParams: INewGroup): Promise<IGroupProfile | null> {
-		if (!groupParams)
-			return null;
+		if (!groupParams) return null;
 		const newGroup = await this.createQueryBuilder()
 			.insert()
 			.into(Group)
@@ -34,11 +31,34 @@ export class GroupRepository extends Repository<Group> {
 				moderators: groupParams.moderators,
 				active: groupParams.active,
 				readOnly: groupParams.readOnly,
-				dateCreate: () => "NOW()",
+				dateCreate: () => 'NOW()',
 			})
 			.returning('*')
 			.execute();
 		return newGroup.raw[0] || null;
+	}
+	/**
+	 * Обновляет данные группы
+	 * @param groupParams
+	 * @returns
+	 */
+	async updateGroup(groupParams: INewGroup): Promise<IGroupProfile | null> {
+		if (!groupParams) return null;
+		const group = await this.createQueryBuilder()
+			.update(Group)
+			.set({
+				nameGroup: groupParams.nameGroup,
+				typeGroup: groupParams.typeGroup,
+				userId: groupParams.userId,
+				users: groupParams.users,
+				moderators: groupParams.moderators,
+				active: groupParams.active,
+				readOnly: groupParams.readOnly,
+			})
+			.where('id = :id', { id: groupParams.groupId })
+			.returning('*')
+			.execute()
+		return group.raw[0] || null;
 	}
 
 	async getGroupProfile(groupOwnerIds: number[] | null): Promise<IGroupProfile[]> {
@@ -88,22 +108,15 @@ export class GroupRepository extends Repository<Group> {
 	 */
 	async getUsersInGroupWithRoles(group: number, userRoles: string[] = ['bot']): Promise<IUserProfile[] | null> {
 		if (!userRoles) return null;
-		const userBot  = await this.createQueryBuilder('g')
+		const userBot = await this.createQueryBuilder('g')
 			.select(['u.id', 'u.fio'])
 			.leftJoin(User, 'u', 'g.users @> ARRAY[u.id]::int[]')
 			.where('u.roles @> ARRAY[:...userRoles]::text[]', { userRoles })
 			.andWhere('g.id = :group', { group })
 			.getRawMany();
-		if(userBot?.length) {
-			return userBot.map(el => ({ id: el.u_id, fio: el.u_fio }))
+		if (userBot?.length) {
+			return userBot.map((el) => ({ id: el.u_id, fio: el.u_fio }));
 		}
 		return null;
 	}
-
-// SELECT json_agg(u.id::int)
-// FROM public."groups" as g
-// left join users as u on (g.users @> ARRAY[u.id]::int[]  )
-// where u.roles @> ARRAY['bot']::text[]
-// and g.id = 60
-
 }

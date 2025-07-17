@@ -11,14 +11,16 @@ export interface IUserProfile {
 }
 
 export interface INewGroup {
-	roomId: number,
+	roomId: number;
+	groupId: number | null;
 	nameGroup: string;
 	typeGroup: 'public' | 'private' | 'hidden';
 	userId: number;
 	users: number[];
-	moderators: number[],
-	active: number,
+	moderators: number[];
+	active: number;
 	readOnly: number;
+	editMode: boolean;
 }
 
 export interface IGroupProfile {

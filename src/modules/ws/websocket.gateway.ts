@@ -67,11 +67,12 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 	@SubscribeMessage('sendMessage')
 	async handleMessage(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
 		// const senderId = data?.senderId || 0;
-		console.log(`>>> client.user: `, client?.user || '!!')
-		console.log(`>>> data: `, data)
+		// console.log(`>>> client.user: `, client?.user || '!!')
+		// console.log(`>>> data: `, data)
 		const insertedContent = await this.messendoService.insertToGroupContent(data);
 		data.dateCreate = insertedContent?.dateCreate || null;
 		this.broadcast('newMessage', data);
+		// Если в группе есть bot
 		const botData = await this.messendoService.prepareMessageForBot(data);
 		if(botData){
 			for await (const data of botData) {
@@ -139,25 +140,37 @@ export class WebSocketGateWay implements OnGatewayConnection, OnGatewayDisconnec
 	}
 
 	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('createNewGroup')
+	@SubscribeMessage('setGroupOper')
 	async createNewGroup(@ConnectedSocket() client: AuthenticatedWebSocket, @MessageBody() data: any) {
 		try {
-			const userId = Number(client?.user?.sub || '0');
-			const username = client?.user?.fio || '';
+			if(!data?.message)
+				throw new Error('The message is invalid or incorrect');
+			if(!client?.user)
+				throw new Error('The User is invalid or incorrect');
+
+			const userId = Number(client.user.sub || '0');
+			const username = client.user.fio || '';
+
 			const newGroup: INewGroup = {
-				roomId: data?.message?.roomId || 0,
-				nameGroup: data?.message?.nameGroup || `${username} Group`,
-				typeGroup:	data?.message?.typeGroup || 'private',
+				roomId: data.message.roomId || 0,
+				groupId: data.message.groupId || null,
+				nameGroup: data.message.nameGroup || `${username} Group`,
+				typeGroup:	data.message.typeGroup || 'private',
 				userId,
-				users: data?.message?.users,
-				moderators: [userId],
-				active: data?.message?.active,
-				readOnly: data?.message?.readOnly,
+				users: data.message.users,
+				moderators: data.message.moderators,
+				active: data.message.active,
+				readOnly: data.message.readOnly,
+				editMode: data.message.editMode || false,
 			}
-			data.message = await this.messendoService.createNewGroup(newGroup);
-			this.sendToUser(userId.toString(), 'newGroup', data);
+			if (data.message.editMode) {
+				data.message = await this.messendoService.updateGroup(newGroup);
+			} else {
+				data.message = await this.messendoService.createNewGroup(newGroup);
+			}
+			this.sendToUser(userId.toString(), 'modifiedGroupProfile', data);
 		} catch (err) {
-			console.log('createNewGroup Error: ', err)
+			console.error('createNewGroup Error: ', err)
 		}
 	}
 

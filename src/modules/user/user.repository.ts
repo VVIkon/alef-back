@@ -38,7 +38,7 @@ export class UserRepository extends Repository<User> {
 				.getOneOrFail();
 			return !!result;
 		} catch (error) {
-			console.log(error.message);
+			console.error(error.message);
 			return false;
 		}
 	}
@@ -52,7 +52,7 @@ export class UserRepository extends Repository<User> {
 
 			return result;
 		} catch (error) {
-			console.log(error.message);
+			console.error(error.message);
 			return null;
 		}
 	}
@@ -67,7 +67,7 @@ export class UserRepository extends Repository<User> {
 
 			return !!result.affected;
 		} catch (error) {
-			console.log(error.message);
+			console.error(error.message);
 			return false;
 		}
 	}

@@ -20,9 +20,7 @@ import { OllamaService } from './ollama.service';
 
 @Injectable()
 export class MessendoService {
-
 	constructor(
-
 		// @InjectRepository(Room)
 		// private roomRepository: Repository<Room>,
 
@@ -136,11 +134,6 @@ export class MessendoService {
 		}
 	}
 	async insertToGroupContent(msgData: IMessage): Promise<Content | null> {
-	// {
-	// 	sendToGroup: number;
-	// 	senderId: number;
-	// 	message: string;
-	// }
 		if (!msgData) return null;
 		try {
 			const msgToContent = {
@@ -186,10 +179,7 @@ export class MessendoService {
 			const room = await custRoomRepository.getRoomProfileById(newGroup.roomId);
 			if (room?.groups) {
 				const realyGroups = await custGroupRepository.getGroupProfile(room.groups);
-				const groupsRoom: number[] = [
-					...(realyGroups.map((el) => el.id) as number[]),
-					groupProfile.id
-				];
+				const groupsRoom: number[] = [...(realyGroups.map((el) => el.id) as number[]), groupProfile.id];
 				await custRoomRepository.updateRoomGroup(newGroup.roomId, groupsRoom);
 			}
 			// Наводняем пользователями группу
@@ -213,22 +203,34 @@ export class MessendoService {
 		}
 	}
 
+	async updateGroup(newGroup: INewGroup): Promise<IGroupProfile | null> {
+		try {
+			if (!newGroup?.editMode) throw new Error('editMode is not correct');
+			// изменяем группу
+			const groupProfile = await this.custGroupRepository.updateGroup(newGroup);
+			return groupProfile;
+		} catch (error) {
+			console.error('MessendoService.updateGroup Error: ', error);
+			return null;
+		}
+	}
+
 	async prepareMessageForBot(data: any): Promise<IMessage[] | null> {
 		const userBot = await this.custGroupRepository.getUsersInGroupWithRoles(data.sendToGroup);
-		if(userBot?.length) {
+		if (userBot?.length) {
 			const botsMessages = await Promise.all(
-				userBot.map(async uEl => {
-					const message = await this.ollamaService.handleOllama(data)
+				userBot.map(async (uEl) => {
+					const message = await this.ollamaService.handleOllama(data);
 					return {
 						token: data.token,
 						message,
 						sendToGroup: data.sendToGroup,
 						groupName: data.groupName,
 						senderId: uEl.id,
-						senderName: uEl.fio
-					}
-				})
-			)
+						senderName: uEl.fio,
+					};
+				}),
+			);
 			return botsMessages || null;
 		}
 		return null;
