@@ -88,7 +88,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJlbWFpb
 
 # -------------- Ollama---------------
 
-POST http://localhost:11434/api/generate
+POST http://192.168.1.99:11434/api/generate
 content-type: application/json
 
 {
